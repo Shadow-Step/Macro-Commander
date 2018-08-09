@@ -102,6 +102,5 @@ namespace Macro_Commander.src
                 throw new Exception("hWnd is null");
 
         }
-        
     }
 }

@@ -77,7 +77,7 @@ namespace Macro_Commander
                                     ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
                                     break;
                                 case HotKeyStatus.Pause:
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause));
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64,48,0,0,src.CaptureMode.EmptyImage)));
                                     break;
                                 case HotKeyStatus.Start:
                                     ViewModel.viewModel.SelectedMacro.CommandStart.Execute(0);
