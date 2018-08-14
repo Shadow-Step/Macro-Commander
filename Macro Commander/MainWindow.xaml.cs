@@ -17,6 +17,7 @@ using Macro_Commander.src;
 using System.Windows.Interop;
 using System.Threading;
 using System.Drawing;
+using Macro_Commander.enu;
 
 namespace Macro_Commander
 {
@@ -74,7 +75,7 @@ namespace Macro_Commander
                             switch (item.Status)
                             {
                                 case HotKeyStatus.ShortClick:
-                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                    //WinWrapper.Click((uint)x.X, (uint)x.Y);
                                     ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X,(uint)x.Y,100,ActionType.Click,ScreenCapture.CaptureFromScreen(64,48,x.X,x.Y)));
                                     break;
                                 case HotKeyStatus.LongClick:
@@ -82,7 +83,7 @@ namespace Macro_Commander
                                     ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
                                     break;
                                 case HotKeyStatus.Pause:
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64,48,0,0,src.CaptureMode.EmptyImage)));
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64,48,0,0, enu.CaptureMode.EmptyImage)));
                                     break;
                                 case HotKeyStatus.Start:
                                     ViewModel.viewModel.SelectedMacro.CommandStart.Execute(0);
