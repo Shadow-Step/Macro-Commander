@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Macro_Commander.src;
+using Macro_Commander.enu;
 
 namespace Macro_Commander
 {

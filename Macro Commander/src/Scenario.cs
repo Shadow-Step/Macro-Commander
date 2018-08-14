@@ -7,18 +7,19 @@ using System.Threading.Tasks;
 
 namespace Macro_Commander.src
 {
+    [Serializable]
     internal class Scenario
     {
         //Fields
 
         //Properties
-        public ObservableCollection<Macro> MacrosList { get; set; }
+        public ObservableCollection<Macro> MacroList { get; set; }
         public double DelayedLaunch { get; set; }
 
         //Constructors
         public Scenario()
         {
-            MacrosList = new ObservableCollection<Macro>();
+            MacroList = new ObservableCollection<Macro>();
         }
 
         //Methods

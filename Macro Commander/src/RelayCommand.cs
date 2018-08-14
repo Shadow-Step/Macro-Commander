@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 namespace Macro_Commander.src
 {
+    [Serializable]
     public class RelayCommand : ICommand
     {
         private Action<object> execute;

@@ -6,17 +6,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Macro_Commander.enu;
 
 namespace Macro_Commander.src
 {
-    public enum HotKeyStatus
-    {
-        ShortClick,
-        LongClick,
-        DoubleClick,
-        Pause,
-        Start
-    }
     public static class WinWrapper
     {
         public static List<HotKey> HotKeys = new List<HotKey>();

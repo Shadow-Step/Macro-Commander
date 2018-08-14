@@ -7,16 +7,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Macro_Commander.enu;
 
 namespace Macro_Commander.src
 {
-    public enum CaptureMode
-    {
-        DrawMiddle,
-        CheckBounds,
-        EmptyImage
-    }
-
     static class ScreenCapture
     {
         public static Bitmap CaptureFromScreen(int width, int height, int x, int y,CaptureMode mode = CaptureMode.DrawMiddle)

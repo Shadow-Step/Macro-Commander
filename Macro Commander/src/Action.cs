@@ -8,16 +8,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Macro_Commander.enu;
 
 namespace Macro_Commander.src
 {
-    public enum ActionType
-    {
-        Click,
-        DoubleClick,
-        Pause
-    }
-
     [Serializable]
     public class Action : INotifyWrapper
     {
@@ -92,6 +86,14 @@ namespace Macro_Commander.src
             Pause = meta.Pause;
             ActionType = meta.ActionType;
             Image = meta.Bitmap;
+        }
+        public Action(ActionTemplate template, UInt32 x, UInt32 y, Bitmap image) : base()
+        {
+            ActionType = template.ActionType;
+            Pause = template.Pause;
+            X = x;
+            Y = y;
+            Image = image;
         }
 
         //Methods

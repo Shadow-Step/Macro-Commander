@@ -59,9 +59,13 @@
     <Compile Include="cvrt\ActionTypeConverter.cs" />
     <Compile Include="cvrt\BitmapSourceConverter.cs" />
     <Compile Include="cvrt\ColorConverter.cs" />
+    <Compile Include="enu\ActionType.cs" />
+    <Compile Include="enu\CaptureMode.cs" />
+    <Compile Include="enu\HotKeyStatus.cs" />
     <Compile Include="res\Statics.cs" />
     <Compile Include="src\Action.cs" />
     <Compile Include="src\ActionMeta.cs" />
+    <Compile Include="src\ActionTemplate.cs" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\HotKey.cs" />
     <Compile Include="src\INotifyWrapper.cs" />

@@ -22,13 +22,40 @@ namespace Macro_Commander.src
             }
         }
         //Fields
+        private ObservableCollection<Macro> _macroList;
+        private ObservableCollection<Scenario> _scenarios;
+        private ObservableCollection<ActionTemplate> _actionTemplates;
         private Macro _selectedMacro;
         private Scenario _selectedScenario;
         private string _projectPath;
         //Properties
-        public ObservableCollection<Macro> MacroList { get; set; }
-        public ObservableCollection<Scenario> Scenarios { get; set; }
-        public ObservableCollection<Action> ActionTemplates { get; set; }
+        public ObservableCollection<Macro> MacroList
+        {
+            get { return _macroList; }
+            set
+            {
+                _macroList = value;
+                PropChanged("MacroList");
+            }
+        }
+        public ObservableCollection<Scenario> Scenarios
+        {
+            get { return _scenarios; }
+            set
+            {
+                _scenarios = value;
+                PropChanged("Scenarios");
+            }
+        }
+        public ObservableCollection<ActionTemplate> ActionTemplates
+        {
+            get { return _actionTemplates; }
+            set
+            {
+                _actionTemplates = value;
+                PropChanged("ActionTemplates");
+            }
+        }
         public Macro SelectedMacro
         {
             get { return _selectedMacro; }
@@ -66,8 +93,14 @@ namespace Macro_Commander.src
         {
             CommandAddMacro = new RelayCommand(AddMacro);
             CommandDelMacro = new RelayCommand(DelMacro, x => MacroList.Count > 0);
+            CommandSaveToFile = new RelayCommand(SaveToFile);
+            CommandLoadFromFile = new RelayCommand(LoadFromFile);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
+            ActionTemplates = new ObservableCollection<ActionTemplate>();
+            ActionTemplates.Add(new ActionTemplate("F1", 500, enu.ActionType.Click));
+            ActionTemplates.Add(new ActionTemplate("F2", 500, enu.ActionType.DoubleClick));
+            ActionTemplates.Add(new ActionTemplate("F3", 3000, enu.ActionType.Pause));
         }
         //Methods
         
@@ -97,10 +130,11 @@ namespace Macro_Commander.src
         }
         private void SaveToFile(object param)
         {
+            ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
             {
-                formatter.Serialize(stream, MacroList);
+                formatter.Serialize(stream, args);
             }
         }
         private void LoadFromFile(object param)
@@ -108,8 +142,12 @@ namespace Macro_Commander.src
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
             {
-                MacroList = (ObservableCollection<Macro>)formatter.Deserialize(stream);
-                SelectedMacro = MacroList.First();
+                ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
+                MacroList = args.MacroList;
+                Scenarios = args.Scenarios;
+                ActionTemplates = args.ActionTemplates;
+                SelectedMacro = args.SelectedMacro;
+                SelectedScenario = args.SelectedScenario;
             }
         }
     }
