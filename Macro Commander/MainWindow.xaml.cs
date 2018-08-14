@@ -25,9 +25,11 @@ namespace Macro_Commander
     /// </summary>
     public partial class MainWindow : Window
     {
+        //Fields
         IntPtr hWnd = IntPtr.Zero;
         HwndSource source;
 
+        //Window
         public MainWindow()
         {
             InitializeComponent();
@@ -51,6 +53,9 @@ namespace Macro_Commander
             WinWrapper.UnregisterKey(0);
         }
 
+        //Methods
+
+        //Global message listener
         private IntPtr MsgListener(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WM_HOTKEY = 0x0312;
@@ -102,29 +107,6 @@ namespace Macro_Commander
             }
 
             return IntPtr.Zero;
-        }
-
-        private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var x = 5;
-            var p = ViewModel.viewModel.SelectedMacro.SelectedAction;
-        }
-
-        private void ListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if(e.Key == Key.Delete)
-            {
-                ViewModel.viewModel.SelectedMacro.CommandDelAction.Execute(ViewModel.viewModel.SelectedMacro.SelectedAction);
-            }
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.viewModel.LoadFromFile();
-        }
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-        {
-            ViewModel.viewModel.SaveToFile();
         }
     }
 }

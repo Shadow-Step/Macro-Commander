@@ -16,6 +16,7 @@ namespace Macro_Commander.src
         CheckBounds,
         EmptyImage
     }
+
     static class ScreenCapture
     {
         public static Bitmap CaptureFromScreen(int width, int height, int x, int y,CaptureMode mode = CaptureMode.DrawMiddle)

@@ -18,9 +18,9 @@ namespace Macro_Commander.src
         private string _name;
         private Action _selectedaction;
         private bool _startedmutex = false;
-        
+
         //Properties
-        public ObservableCollection<Action> Actions { get; set; } = null;
+        public ObservableCollection<Action> Actions { get; set; }
         public Action SelectedAction
         {
             get { return _selectedaction; }
@@ -48,123 +48,27 @@ namespace Macro_Commander.src
                 PropChanged("StartedMutex");
             }
         }
-        //Commands
-        [NonSerialized]
-        private RelayCommand _command_addaction;
-        [NonSerialized]
-        private RelayCommand _command_delaction;
-        [NonSerialized]
-        private RelayCommand _command_start;
-        [NonSerialized]
-        private RelayCommand _command_moveforward;
-        [NonSerialized]
-        private RelayCommand _command_moveback;
 
-        public RelayCommand CommandAddAction
-        {
-            get
-            {
-                return _command_addaction ?? (_command_addaction = new RelayCommand(obj =>
-                {
-                    if(obj is ActionMeta meta)
-                    {
-                        Actions.Add(new Action(meta));
-                        SelectedAction = Actions.Last();
-                    }
-                }
-                ));
-            }
-        }
-        public RelayCommand CommandDelAction
-        {
-            get
-            {
-                return _command_delaction ?? (_command_delaction = new RelayCommand(obj =>
-                {
-                    if(obj is Action action)
-                    {
-                        var index = Actions.IndexOf(action);
-                        if (index < Actions.Count - 1)
-                            SelectedAction = Actions[index + 1];
-                        else if (index > 0)
-                            SelectedAction = Actions[index - 1];
-                        Actions.Remove(action);
-                    }
-                }));
-            }
-        }
-        public RelayCommand CommandStart
-        {
-            get
-            {
-                return _command_start ?? (_command_start = new RelayCommand(obj => Start(obj), obj=> Actions.Count > 0));
-            }
-        }
-        public RelayCommand CommandMoveForward
-        {
-            get
-            {
-                return _command_moveforward ?? (_command_moveforward = new RelayCommand(obj =>
-                {
-                    if(obj is Action action)
-                    {
-                        var index = Actions.IndexOf(action);
-                        if(index < Actions.Count - 1)
-                        {
-                            Action temp = Actions[index + 1];
-                            Actions[index + 1] = Actions[index];
-                            Actions[index] = temp;
-                            SelectedAction = action;
-                        }
-                    }
-                }
-                ));
-            }
-        }
-        public RelayCommand CommandMoveBack
-        {
-            get
-            {
-                return _command_moveback ?? (_command_moveback = new RelayCommand(obj =>
-                {
-                    if (obj is Action action)
-                    {
-                        var index = Actions.IndexOf(action);
-                        if (index > 0)
-                        {
-                            Action temp = Actions[index - 1];
-                            Actions[index - 1] = Actions[index];
-                            Actions[index] = temp;
-                            SelectedAction = action;
-                        }
-                    }
-                }
-                ));
-            }
-        }
-        //Methods
+        //Commands
+        public RelayCommand CommandAddAction { get; set; }       
+        public RelayCommand CommandDelAction { get; set; }
+        public RelayCommand CommandStart { get; set; }
+        public RelayCommand CommandMoveForward { get; set; }
+        public RelayCommand CommandMoveBackwards { get; set; }
+
+        //Constructor
         public Macro()
         {
+            CommandAddAction = new RelayCommand(AddAction);
+            CommandDelAction = new RelayCommand(DelAction);
+            CommandStart = new RelayCommand(Start);
+            CommandMoveForward = new RelayCommand(MoveActionForward);
+            CommandMoveBackwards = new RelayCommand(MoveActionBackwards);
             Actions = new ObservableCollection<Action>();
             Name = DateTime.Now.Millisecond.ToString(); //!!!
         }
-        public void Start(object obj)
-        {
-            if (obj is int time)
-            {
-                if (StartThread == null || (StartThread != null && StartThread.IsAlive == false))
-                {
-                    
-                    StartThread = new Thread(() => ThreadStart(time));
-                    StartThread.Start();
-                }
-                else
-                {
-                    StartThread.Abort();
-                    StartThread.Join();
-                }
-            }
-        }
+
+        //Methods
         public void ThreadStart(int time)
         {
             try
@@ -188,6 +92,76 @@ namespace Macro_Commander.src
             
         }
 
+        //Commands
+        private void Start(object param)
+        {
+            if (param is int time)
+            {
+                if (StartThread == null || (StartThread != null && StartThread.IsAlive == false))
+                {
+
+                    StartThread = new Thread(() => ThreadStart(time));
+                    StartThread.Start();
+                }
+                else
+                {
+                    StartThread.Abort();
+                    StartThread.Join();
+                }
+            }
+        }
+        private void AddAction(object param)
+        {
+            if (param is ActionMeta meta)
+            {
+                Actions.Add(new Action(meta));
+                SelectedAction = Actions.Last();
+            }
+        }
+        private void DelAction(object param)
+        {
+            if (param is Action action)
+            {
+                var index = Actions.IndexOf(action);
+                if (index < Actions.Count - 1)
+                    SelectedAction = Actions[index + 1];
+                else if (index > 0)
+                    SelectedAction = Actions[index - 1];
+                Actions.Remove(action);
+            }
+        }
+        private void StartMacro(object param)
+        {
+
+        }
+        private void MoveActionForward(object param)
+        {
+            if (param is Action action)
+            {
+                var index = Actions.IndexOf(action);
+                if (index < Actions.Count - 1)
+                {
+                    Action temp = Actions[index + 1];
+                    Actions[index + 1] = Actions[index];
+                    Actions[index] = temp;
+                    SelectedAction = action;
+                }
+            }
+        }
+        private void MoveActionBackwards(object param)
+        {
+            if (param is Action action)
+            {
+                var index = Actions.IndexOf(action);
+                if (index > 0)
+                {
+                    Action temp = Actions[index - 1];
+                    Actions[index - 1] = Actions[index];
+                    Actions[index] = temp;
+                    SelectedAction = action;
+                }
+            }
+        }
        
     }
 }

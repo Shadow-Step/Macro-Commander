@@ -12,15 +12,15 @@ namespace Macro_Commander.src
     {
         public UInt32 X;
         public UInt32 Y;
-        public int RestTime;
+        public int Pause;
         public ActionType ActionType;
         public Bitmap Bitmap;
 
-        public ActionMeta(UInt32 x, UInt32 y, int RestTime, ActionType type, Bitmap bitmap = null)
+        public ActionMeta(UInt32 x, UInt32 y, int Pause, ActionType type, Bitmap bitmap = null)
         {
             this.X = x;
             this.Y = y;
-            this.RestTime = RestTime;
+            this.Pause = Pause;
             this.ActionType = type;
             this.Bitmap = bitmap;
         }

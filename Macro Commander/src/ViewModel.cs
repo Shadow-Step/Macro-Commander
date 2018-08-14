@@ -12,11 +12,8 @@ namespace Macro_Commander.src
     [Serializable]
     class ViewModel : INotifyWrapper
     {
-        //Fields
+        //Singleton
         private static ViewModel _viewmodel;
-        private Macro _selectedmacro;
-
-        //Properties
         public static ViewModel viewModel
         {
             get
@@ -24,76 +21,89 @@ namespace Macro_Commander.src
                 return _viewmodel ?? (_viewmodel = new ViewModel());
             }
         }
-        public ObservableCollection<Macro> MacroList { get; set; } = new ObservableCollection<Macro>();
+        //Fields
+        private Macro _selectedMacro;
+        private Scenario _selectedScenario;
+        private string _projectPath;
+        //Properties
+        public ObservableCollection<Macro> MacroList { get; set; }
+        public ObservableCollection<Scenario> Scenarios { get; set; }
+        public ObservableCollection<Action> ActionTemplates { get; set; }
         public Macro SelectedMacro
         {
-            get { return _selectedmacro; }
+            get { return _selectedMacro; }
             set
             {
-                _selectedmacro = value;
+                _selectedMacro = value;
                 PropChanged("SelectedMacro");
             }
         }
-        //Commands
-        private RelayCommand command_addmacro;
-        private RelayCommand command_delmacro;
-
-        public RelayCommand CommandAddMacro
+        public Scenario SelectedScenario
         {
-            get
+            get { return _selectedScenario; }
+            set
             {
-                return command_addmacro ?? (command_addmacro = new RelayCommand(obj =>
-                {
-                    MacroList.Add(new Macro());
-                    SelectedMacro = MacroList.Last();
-                }
-          ));
+                _selectedScenario = value;
+                PropChanged("SelectedScenario");
             }
         }
-        public RelayCommand CommandDelMacro
+        public string ProjectPath
         {
-            get
+            get { return _projectPath; }
+            set
             {
-                return command_delmacro ?? (command_delmacro = new RelayCommand(
-                    obj =>
-                    {
-                        if (obj is Macro macro && macro != null)
-                        {
-                            var index = MacroList.IndexOf(macro);
-                            MacroList.Remove(macro);
-                            if(MacroList.Count > 0)
-                            {
-                                if (index < MacroList.Count)
-                                    SelectedMacro = MacroList[index];
-                                else
-                                    SelectedMacro = MacroList[index - 1];
-                            }
-                            
-                        }
-                        else
-                            throw new Exception();
-                    },
-                    obj =>
-                    {
-                        return MacroList.Count > 0;
-                    }
-                    ));
+                _projectPath = value;
+                PropChanged("ProjectPath");
             }
+        }
+        //Commands
+        public RelayCommand CommandAddMacro { get; set; }
+        public RelayCommand CommandDelMacro { get; set; }
+        public RelayCommand CommandSaveToFile { get; set; }
+        public RelayCommand CommandLoadFromFile { get; set; }
+        //Constructor
+        private ViewModel()
+        {
+            CommandAddMacro = new RelayCommand(AddMacro);
+            CommandDelMacro = new RelayCommand(DelMacro, x => MacroList.Count > 0);
+            MacroList = new ObservableCollection<Macro>();
+            Scenarios = new ObservableCollection<Scenario>();
         }
         //Methods
-        public void PlayMacro()
+        
+        //Commands
+        private void AddMacro(object param)
         {
-
+            MacroList.Add(new Macro());
+            SelectedMacro = MacroList.Last();
         }
-        public void SaveToFile()
+        private void DelMacro(object param)
+        {
+            if (param is Macro macro && macro != null)
+            {
+                var index = MacroList.IndexOf(macro);
+                MacroList.Remove(macro);
+                if (MacroList.Count > 0)
+                {
+                    if (index < MacroList.Count)
+                        SelectedMacro = MacroList[index];
+                    else
+                        SelectedMacro = MacroList[index - 1];
+                }
+
+            }
+            else
+                throw new Exception();
+        }
+        private void SaveToFile(object param)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream stream = new FileStream("temp.bin",FileMode.OpenOrCreate))
+            using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
             {
                 formatter.Serialize(stream, MacroList);
             }
         }
-        public void LoadFromFile()
+        private void LoadFromFile(object param)
         {
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))

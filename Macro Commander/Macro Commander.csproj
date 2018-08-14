@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="cvrt\ActionTypeConverter.cs" />
+    <Compile Include="cvrt\BitmapSourceConverter.cs" />
     <Compile Include="cvrt\ColorConverter.cs" />
     <Compile Include="res\Statics.cs" />
     <Compile Include="src\Action.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="src\Scenario.cs" />
     <Compile Include="src\ScreenCapture.cs" />
     <Compile Include="src\ViewModel.cs" />
+    <Compile Include="src\ViewModelArgs.cs" />
     <Compile Include="src\WinWrapper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

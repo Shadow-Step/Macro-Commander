@@ -17,6 +17,7 @@ namespace Macro_Commander.src
         DoubleClick,
         Pause
     }
+
     [Serializable]
     public class Action : INotifyWrapper
     {
@@ -24,11 +25,7 @@ namespace Macro_Commander.src
         private UInt32 _x = 0;
         private UInt32 _y = 0;
         private int _pause = 0;
-
-        [NonSerialized]
-        private BitmapSource _bitmapsource;
-
-        private Bitmap _bitmap;
+        private Bitmap _image;
         private ActionType _action_type;
 
         //Properties
@@ -50,22 +47,13 @@ namespace Macro_Commander.src
                 PropChanged("Y");
             }
         }
-        public int Pause
+        public Bitmap Image
         {
-            get { return _pause; }
+            get { return _image; }
             set
             {
-                _pause = value;
-                PropChanged("Pause");
-            }
-        }
-        public BitmapSource Bitmap
-        {
-            get { return _bitmapsource ?? (_bitmapsource = Imaging.CreateBitmapSourceFromHBitmap(_bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions())); }
-            set
-            {
-                _bitmapsource = value;
-                PropChanged("Bitmap");
+                _image = value;
+                PropChanged("Image");
             }
         }
         public ActionType ActionType
@@ -77,7 +65,16 @@ namespace Macro_Commander.src
                 PropChanged("ActionType");
             }
         }
-
+        public int Pause
+        {
+            get { return _pause; }
+            set
+            {
+                _pause = value;
+                PropChanged("Pause");
+            }
+        }
+        
         //Constructors
         public Action()
         {
@@ -92,9 +89,9 @@ namespace Macro_Commander.src
         {
             X = meta.X;
             Y = meta.Y;
-            Pause = meta.RestTime;
+            Pause = meta.Pause;
             ActionType = meta.ActionType;
-            _bitmap = meta.Bitmap;
+            Image = meta.Bitmap;
         }
 
         //Methods
