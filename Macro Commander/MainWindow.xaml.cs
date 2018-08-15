@@ -67,68 +67,58 @@ namespace Macro_Commander
                     var w = wParam.ToInt32();
                     foreach (var item in WinWrapper.HotKeys)
                     {
-                        var shortcode = WinWrapper.KeyDict[item.Key];
-                        var longcode = WinWrapper.VirtualKeyCodes[shortcode];
-                        if (l == shortcode || l == longcode || w == shortcode || w == longcode)
+                        var value = WinWrapper.KeyDict[item.Key];
+                        var longcode = WinWrapper.VirtualKeyCodes[value];
+                        if (l == value || l == longcode || w == value || w == longcode)
                         {
-
+                            var x = System.Windows.Forms.Cursor.Position;
+                            switch (item.Status)
+                            {
+                                case HotKeyStatus.ShortClick:
+                                    //WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 100, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    break;
+                                case HotKeyStatus.LongClick:
+                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    break;
+                                case HotKeyStatus.Pause:
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64, 48, 0, 0, enu.CaptureMode.EmptyImage)));
+                                    break;
+                                case HotKeyStatus.Start:
+                                    if(ViewModel.viewModel.CommandExecuteScenarioAsync.CanExecute(null))
+                                    ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
+                                    break;
+                                case HotKeyStatus.DoubleClick:
+                                    ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 500, ActionType.DoubleClick, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
                         }
                     }
                     break;
                 default:
                     break;
             }
+
             return IntPtr.Zero;
         }
 
-        //private IntPtr MsgListener(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        //{
-        //    const int WM_HOTKEY = 0x0312;
-        //    switch (msg)
-        //    {
-        //        case WM_HOTKEY:
-        //            var l = lParam.ToInt32();
-        //            var w = wParam.ToInt32();
-        //            foreach (var item in WinWrapper.HotKeys)
-        //            {
-        //                var value = WinWrapper.KeyDict[item.Key];
-        //                var longcode = WinWrapper.VirtualKeyCodes[value];
-        //                if(l == value || l == longcode || w == value || w == longcode)
-        //                {
-        //                    var x = System.Windows.Forms.Cursor.Position;
-        //                    switch (item.Status)
-        //                    {
-        //                        case HotKeyStatus.ShortClick:
-        //                            //WinWrapper.Click((uint)x.X, (uint)x.Y);
-        //                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X,(uint)x.Y,100,ActionType.Click,ScreenCapture.CaptureFromScreen(64,48,x.X,x.Y)));
-        //                            break;
-        //                        case HotKeyStatus.LongClick:
-        //                            WinWrapper.Click((uint)x.X, (uint)x.Y);
-        //                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
-        //                            break;
-        //                        case HotKeyStatus.Pause:
-        //                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64,48,0,0, enu.CaptureMode.EmptyImage)));
-        //                            break;
-        //                        case HotKeyStatus.Start:
-        //                            ViewModel.viewModel.SelectedMacro.CommandStart.Execute(0);
-        //                            break;
-        //                        case HotKeyStatus.DoubleClick:
-        //                            ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 500, ActionType.DoubleClick, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
-        //                            WinWrapper.Click((uint)x.X, (uint)x.Y);
-        //                            WinWrapper.Click((uint)x.X, (uint)x.Y);
-        //                            break;
-        //                        default:
-        //                            break;
-        //                    }
-        //                    break;
-        //                }
-        //            }
-        //            break;
-        //        default:
-        //            break;
-        //    }
-
-        //    return IntPtr.Zero;
-        //}
+        private void AvailableMacros_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataGridRow row = sender as DataGridRow;
+            Macro item = row.Item as Macro;
+            ViewModel.viewModel.SelectedScenario.CommandAddMacro.Execute(item);
+        }
+        private void ScenarioMacros_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataGridRow row = sender as DataGridRow;
+            Macro item = row.Item as Macro;
+            ViewModel.viewModel.SelectedScenario.CommandDelMacro.Execute(item);
+        }
     }
 }

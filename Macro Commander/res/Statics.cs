@@ -16,6 +16,7 @@ namespace Macro_Commander.res
             {ActionType.DoubleClick, "!!!DoubleClick"},
             {ActionType.Pause, "!!!Pause"}
         };
+        public static List<enu.ExecutionMode> ExecutionModes { get; set; } = new List<ExecutionMode>() { enu.ExecutionMode.Loop, enu.ExecutionMode.Single };
         
     }
 }

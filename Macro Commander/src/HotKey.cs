@@ -33,9 +33,5 @@ namespace Macro_Commander.src
 
         }
         //Methods
-        public void Execute()
-        {
-            Action();
-        }
     }
 }

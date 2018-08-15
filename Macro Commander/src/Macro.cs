@@ -11,13 +11,11 @@ namespace Macro_Commander.src
     [Serializable]
     public class Macro : INotifyWrapper
     {
-        [NonSerialized]
-        private Thread StartThread; //!!!
-
         //Fields
         private string _name;
         private Action _selectedaction;
         private bool _startedmutex = false;
+        private double _totalExecutionTime;
 
         //Properties
         public ObservableCollection<Action> Actions { get; set; }
@@ -48,11 +46,24 @@ namespace Macro_Commander.src
                 PropChanged("StartedMutex");
             }
         }
+        public double TotalExecutionTime
+        {
+            get
+            {
+                return (double)Actions.Sum(x=>x.Pause) / 1000;
+            }
+            set
+            {
+                _totalExecutionTime = value;
+                PropChanged("TotalExecutionTime");
+            }
+
+        }
 
         //Commands
         public RelayCommand CommandAddAction { get; set; }       
         public RelayCommand CommandDelAction { get; set; }
-        public RelayCommand CommandStart { get; set; }
+        public RelayCommand CommandExecute { get; set; }
         public RelayCommand CommandMoveForward { get; set; }
         public RelayCommand CommandMoveBackwards { get; set; }
 
@@ -61,10 +72,11 @@ namespace Macro_Commander.src
         {
             CommandAddAction = new RelayCommand(AddAction);
             CommandDelAction = new RelayCommand(DelAction);
-            CommandStart = new RelayCommand(Start);
+            CommandExecute = new RelayCommand(Execute);
             CommandMoveForward = new RelayCommand(MoveActionForward);
             CommandMoveBackwards = new RelayCommand(MoveActionBackwards);
             Actions = new ObservableCollection<Action>();
+            Actions.CollectionChanged += Actions_CollectionChanged;
             Name = DateTime.Now.Millisecond.ToString(); //!!!
         }
 
@@ -93,21 +105,11 @@ namespace Macro_Commander.src
         }
 
         //Commands
-        private void Start(object param)
+        private void Execute(object param)
         {
-            if (param is int time)
+            foreach (var item in Actions)
             {
-                if (StartThread == null || (StartThread != null && StartThread.IsAlive == false))
-                {
-
-                    StartThread = new Thread(() => ThreadStart(time));
-                    StartThread.Start();
-                }
-                else
-                {
-                    StartThread.Abort();
-                    StartThread.Join();
-                }
+                item.Execute();
             }
         }
         private void AddAction(object param)
@@ -162,6 +164,11 @@ namespace Macro_Commander.src
                 }
             }
         }
-       
+
+        //TEMP!!!
+        private void Actions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            PropChanged("TotalExecutionTime");
+        }
     }
 }

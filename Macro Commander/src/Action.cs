@@ -113,8 +113,6 @@ namespace Macro_Commander.src
                 default:
                     break;
             }
-            
-            Thread.Sleep(Pause); 
         }
     }
 }

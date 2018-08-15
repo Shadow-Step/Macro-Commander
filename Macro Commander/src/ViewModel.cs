@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Macro_Commander.src
@@ -22,12 +23,14 @@ namespace Macro_Commander.src
             }
         }
         //Fields
+        private CancellationTokenSource _tokenSource;
         private ObservableCollection<Macro> _macroList;
         private ObservableCollection<Scenario> _scenarios;
         private ObservableCollection<ActionTemplate> _actionTemplates;
         private Macro _selectedMacro;
         private Scenario _selectedScenario;
         private string _projectPath;
+        private bool _executionStarted;
         //Properties
         public ObservableCollection<Macro> MacroList
         {
@@ -83,11 +86,23 @@ namespace Macro_Commander.src
                 PropChanged("ProjectPath");
             }
         }
+        public bool ExecutionStarted
+        {
+            get { return _executionStarted; }
+            set
+            {
+                _executionStarted = value;
+                PropChanged("ExecutionStarted");
+            }
+        }
         //Commands
         public RelayCommand CommandAddMacro { get; set; }
         public RelayCommand CommandDelMacro { get; set; }
         public RelayCommand CommandSaveToFile { get; set; }
         public RelayCommand CommandLoadFromFile { get; set; }
+        public RelayCommand CommandAddScenario { get; set; }
+        public RelayCommand CommandDelScenario { get; set; }
+        public RelayCommand CommandExecuteScenarioAsync { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -95,6 +110,8 @@ namespace Macro_Commander.src
             CommandDelMacro = new RelayCommand(DelMacro, x => MacroList.Count > 0);
             CommandSaveToFile = new RelayCommand(SaveToFile);
             CommandLoadFromFile = new RelayCommand(LoadFromFile);
+            CommandAddScenario = new RelayCommand(AddScenario);
+            CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
@@ -104,6 +121,7 @@ namespace Macro_Commander.src
         }
         //Methods
         
+       
         //Commands
         private void AddMacro(object param)
         {
@@ -148,6 +166,74 @@ namespace Macro_Commander.src
                 ActionTemplates = args.ActionTemplates;
                 SelectedMacro = args.SelectedMacro;
                 SelectedScenario = args.SelectedScenario;
+            }
+        }
+        private void AddScenario(object param)
+        {
+            Scenarios.Add(new Scenario());
+            SelectedScenario = Scenarios.Last();
+        }
+        private async void ExecuteScenarioAsync(object param)
+        {
+            if (!ExecutionStarted)
+            {
+                try
+                {
+                    ExecutionStarted = true;
+                    _tokenSource = new CancellationTokenSource();
+                    var token = _tokenSource.Token;
+                    await Task.Factory.StartNew(() =>
+                    {
+                        if (SelectedScenario.DelayedLaunch)
+                        {
+                            var startTime = DateTime.Now.AddSeconds(SelectedScenario.DelayTime);
+                            do
+                            {
+                                if (token.IsCancellationRequested)
+                                    return;
+                            } while (DateTime.Now < startTime);
+                        }
+                        do
+                        {
+                            foreach (var macros in SelectedScenario.MacroList)
+                            {
+                                foreach (var action in macros.Actions)
+                                {
+                                    action.Execute();
+                                    var SleepTime = DateTime.Now.AddMilliseconds(action.Pause);
+                                    while (DateTime.Now < SleepTime)
+                                    {
+                                        if (token.IsCancellationRequested)
+                                            return;
+                                    }
+                                }
+                            }
+                            if(SelectedScenario.ExecutionMode == enu.ExecutionMode.Loop)
+                            {
+                                var endTime = DateTime.Now.AddSeconds(SelectedScenario.LoopTime);
+                                do
+                                {
+                                    if (token.IsCancellationRequested)
+                                        return;
+                                } while (DateTime.Now < endTime);
+                            }
+                        } while (SelectedScenario.ExecutionMode == enu.ExecutionMode.Loop);
+                        
+                    }, token);
+                }
+                catch (Exception)
+                {
+                    throw new Exception();
+                }
+                finally
+                {
+                    ExecutionStarted = false;
+                }
+
+            }
+            else
+            {
+                _tokenSource?.Cancel();
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Macro_Commander.src
 {
+    [Serializable]
     public class ActionTemplate : INotifyWrapper
     {
         //Fields
