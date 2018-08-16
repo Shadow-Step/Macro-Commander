@@ -115,8 +115,8 @@ namespace Macro_Commander.src
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
-            ActionTemplates.Add(new ActionTemplate("F1", 500, enu.ActionType.Click));
-            ActionTemplates.Add(new ActionTemplate("F2", 500, enu.ActionType.DoubleClick));
+            ActionTemplates.Add(new ActionTemplate("F1", 500, enu.ActionType.LeftClick));
+            ActionTemplates.Add(new ActionTemplate("F2", 500, enu.ActionType.RightClick));
             ActionTemplates.Add(new ActionTemplate("F3", 3000, enu.ActionType.Pause));
         }
         //Methods

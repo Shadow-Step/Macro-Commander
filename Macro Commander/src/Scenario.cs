@@ -20,7 +20,7 @@ namespace Macro_Commander.src
         private bool _delayedLaunch;
         private double _delayTime;
         private double _loopTime;
-
+        private string _hotKey;
         //Properties
         public ObservableCollection<Macro> MacroList { get; set; }
         public Macro SelectedMacro
@@ -100,7 +100,15 @@ namespace Macro_Commander.src
                 PropChanged("LoopTime");
             }
         }
-
+        public string HotKey
+        {
+            get { return _hotKey; }
+            set
+            {
+                _hotKey = value;
+                PropChanged("HotKey");
+            }
+        }
         //Commands
         public RelayCommand CommandAddMacro { get; set; }
         public RelayCommand CommandDelMacro { get; set; }

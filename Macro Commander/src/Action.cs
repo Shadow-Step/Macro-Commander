@@ -21,7 +21,7 @@ namespace Macro_Commander.src
         private int _pause = 0;
         private Bitmap _image;
         private ActionType _action_type;
-
+        private int _times;
         //Properties
         public UInt32 X
         {
@@ -68,7 +68,15 @@ namespace Macro_Commander.src
                 PropChanged("Pause");
             }
         }
-        
+        public int Times
+        {
+            get { return _times; }
+            set
+            {
+                _times = value;
+                PropChanged("Times");
+            }
+        }
         //Constructors
         public Action()
         {
@@ -86,6 +94,7 @@ namespace Macro_Commander.src
             Pause = meta.Pause;
             ActionType = meta.ActionType;
             Image = meta.Bitmap;
+            Times = meta.Times;
         }
         public Action(ActionTemplate template, UInt32 x, UInt32 y, Bitmap image) : base()
         {
@@ -101,10 +110,11 @@ namespace Macro_Commander.src
         {
             switch (ActionType)
             {
-                case ActionType.Click:
-                    WinWrapper.Click(X, Y);
+                case ActionType.LeftClick:
+                    for (int i = 0; i < Times; i++)
+                        WinWrapper.Click(X, Y);
                     break;
-                case ActionType.DoubleClick:
+                case ActionType.RightClick:
                     WinWrapper.Click(X, Y);
                     WinWrapper.Click(X, Y);
                     break;

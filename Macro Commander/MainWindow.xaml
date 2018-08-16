@@ -111,6 +111,7 @@
             
         </ToolBar>
         <TabControl Grid.Row="2" Margin="15 5 15 5">
+            <!--Scenario-->
             <TabItem Header="Scenarios">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -124,7 +125,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
 
-                    <!-- 0 0 Grid-->
+                    <!-- DataGrids Grid-->
                     <Border BorderThickness="2" BorderBrush="Black" Grid.Column="0" Grid.Row="0">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -170,13 +171,13 @@
                             </DataGrid>
                         </Grid>
                     </Border>
-                    <!-- 0 2 Grid -->
+                    <!-- Scenarios Grid -->
                     <DataGrid AutoGenerateColumns="False" HeadersVisibility="None" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Path=Scenarios}" SelectedItem="{Binding Path=SelectedScenario}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <!-- 2 0 Grid-->
+                    <!-- Preview List Grid-->
                     <ListBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedScenario.PreviewMacro.Actions}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -184,7 +185,7 @@
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
-                    <!-- 2 2 Grid-->
+                    <!-- Options Grid-->
                     <Grid Grid.Row="2" Grid.Column="2" DataContext="{Binding Path=SelectedScenario}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -195,24 +196,28 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Mode:"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=ExecutionMode}"/>
 
+                        <TextBlock Grid.Row="0" Margin="0 2 0 0" Grid.Column="0" Text="Mode:"/>
                         <TextBlock Grid.Row="1" Margin="0 2 0 0" Grid.Column="0" Text="Delay:"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=DelayTime}"/>
-
                         <TextBlock Grid.Row="2" Margin="0 2 0 0" Grid.Column="0" Text="Loop Time:"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=LoopTime}"/>
+                        <TextBlock Grid.Row="3" Margin="0 2 0 0" Grid.Column="0" Text="HotKey:"/>
 
-                        <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=ExecutionMode}"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=DelayTime}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=LoopTime}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey}"/>
+                        <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
 
                     </Grid>
+                    
+                    <!--Splitters-->
                     <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="5"/>
                     <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5"/>
                 </Grid>
             </TabItem>
+            <!--Macro-->
             <TabItem Header="Macro Constructor">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -292,15 +297,18 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Action:"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="X:"/>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Y:"/>
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Pause:"/>
-                            <TextBox Grid.Row="0" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=ActionType, Converter={StaticResource ActionTypeConverter}}"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Times:"/>
+                            <ComboBox Grid.Row="0" Margin="5 0 0 0" Grid.Column="1" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=ActionType}" />
                             <TextBox Grid.Row="1" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=X}"/>
                             <TextBox Grid.Row="2" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Y}"/>
                             <TextBox Grid.Row="3" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Pause}"/>
+                            <TextBox Grid.Row="4" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Times}"/>
                         </Grid>
                         <!--<StackPanel Grid.Row="2" DataContext="{Binding Path=SelectedMacro.SelectedAction}">
                             <StackPanel Orientation="Horizontal">

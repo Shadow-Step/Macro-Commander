@@ -18,9 +18,9 @@ namespace Macro_Commander
             {
                 switch (action)
                 {
-                    case ActionType.Click:
+                    case ActionType.LeftClick:
                         return "LimeGreen";
-                    case ActionType.DoubleClick:
+                    case ActionType.RightClick:
                         return "Magenta";
                     case ActionType.Pause:
                         return "Aqua";

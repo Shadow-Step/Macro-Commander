@@ -76,21 +76,21 @@ namespace Macro_Commander
                             {
                                 case HotKeyStatus.ShortClick:
                                     //WinWrapper.Click((uint)x.X, (uint)x.Y);
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 100, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 100, ActionType.LeftClick, 1, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
                                     break;
                                 case HotKeyStatus.LongClick:
                                     WinWrapper.Click((uint)x.X, (uint)x.Y);
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.Click, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.LeftClick, 1, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
                                     break;
                                 case HotKeyStatus.Pause:
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, ScreenCapture.CaptureFromScreen(64, 48, 0, 0, enu.CaptureMode.EmptyImage)));
+                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, 0, ScreenCapture.CaptureFromScreen(64, 48, 0, 0, enu.CaptureMode.EmptyImage)));
                                     break;
                                 case HotKeyStatus.Start:
                                     if(ViewModel.viewModel.CommandExecuteScenarioAsync.CanExecute(null))
                                     ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
                                     break;
                                 case HotKeyStatus.DoubleClick:
-                                    ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 500, ActionType.DoubleClick, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                    ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 500, ActionType.LeftClick, 2, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
                                     WinWrapper.Click((uint)x.X, (uint)x.Y);
                                     WinWrapper.Click((uint)x.X, (uint)x.Y);
                                     break;
@@ -112,13 +112,15 @@ namespace Macro_Commander
         {
             DataGridRow row = sender as DataGridRow;
             Macro item = row.Item as Macro;
+            if(ViewModel.viewModel.SelectedScenario.CommandAddMacro.CanExecute(item))
             ViewModel.viewModel.SelectedScenario.CommandAddMacro.Execute(item);
         }
         private void ScenarioMacros_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DataGridRow row = sender as DataGridRow;
             Macro item = row.Item as Macro;
-            ViewModel.viewModel.SelectedScenario.CommandDelMacro.Execute(item);
+            if (ViewModel.viewModel.SelectedScenario.CommandDelMacro.CanExecute(item))
+                ViewModel.viewModel.SelectedScenario.CommandDelMacro.Execute(item);
         }
     }
 }

@@ -8,8 +8,8 @@ namespace Macro_Commander.enu
 {
     public enum ActionType
     {
-        Click,
-        DoubleClick,
+        LeftClick,
+        RightClick,
         Pause
     }
 }
