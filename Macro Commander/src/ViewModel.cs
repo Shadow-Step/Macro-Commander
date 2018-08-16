@@ -115,9 +115,10 @@ namespace Macro_Commander.src
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
-            ActionTemplates.Add(new ActionTemplate("F1", 500, enu.ActionType.LeftClick));
-            ActionTemplates.Add(new ActionTemplate("F2", 500, enu.ActionType.RightClick));
-            ActionTemplates.Add(new ActionTemplate("F3", 3000, enu.ActionType.Pause));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F1",enu.HotKeyStatus.AddAction), 500, enu.ActionType.LeftClick, 1));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F2", enu.HotKeyStatus.AddAction), 500, enu.ActionType.RightClick, 1));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F3", enu.HotKeyStatus.AddAction), 500, enu.ActionType.LeftClick, 2));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F4", enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
         }
         //Methods
         

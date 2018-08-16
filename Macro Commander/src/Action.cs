@@ -91,10 +91,10 @@ namespace Macro_Commander.src
         {
             X = meta.X;
             Y = meta.Y;
-            Pause = meta.Pause;
-            ActionType = meta.ActionType;
             Image = meta.Bitmap;
-            Times = meta.Times;
+            Pause = meta.Template.Pause;
+            ActionType = meta.Template.ActionType;
+            Times = meta.Template.Times;
         }
         public Action(ActionTemplate template, UInt32 x, UInt32 y, Bitmap image) : base()
         {

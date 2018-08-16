@@ -11,6 +11,7 @@
         <local:ColorConverter x:Key="BorderBrushConverter"/>
         <local:ActionTypeConverter x:Key="ActionTypeConverter"/>
         <local:BitmapSourceConverter x:Key="BitmapSourceConverter"/>
+        <local:HotKeyConverter x:Key="HotKeyConverter"/>
 
         <DataTemplate x:Key="ListBoxUnselected">
             <Border Width="125" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
@@ -45,12 +46,14 @@
         <DataTemplate x:Key="ActionTemplate">
             <Border Width="125" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
                 <StackPanel Orientation="Vertical" Margin="2 0 2 0">
-                    <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=A: {0}, Path=ActionType}"/>
-                    <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=H: {0}, Path=HotKey}"/>
-                    <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                    <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Action: {0}, Path=ActionType}"/>
+                    <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=HotKey: {0}, Path=HotKey,Converter={StaticResource HotKeyConverter}}"/>
+                    <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Pause: {0}, Path=Pause}"/>
+                    <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Clicks: {0}, Path=Times}"/>
                 </StackPanel>
             </Border>
         </DataTemplate>
+        
         <Style x:Key="ListBoxStyle" TargetType="ListBox">
             <Setter Property="IsEnabled" Value="False"/>
             <Style.Triggers>
@@ -78,7 +81,22 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+        <Style x:Key="TemplateBorderStyle" TargetType="Border">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=ExecutionStarted}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="OptionsGridStyle" TargetType="Grid">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=ExecutionStarted}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
             <Border Name="Brd" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" BorderThickness="1">
                 <ContentPresenter RecognizesAccessKey="True"  Margin="{TemplateBinding Padding}"></ContentPresenter>
@@ -207,7 +225,7 @@
                         <ComboBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=ExecutionMode}"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=DelayTime}"/>
                         <TextBox Grid.Row="2" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=LoopTime}"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}"/>
                         <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
 
                     </Grid>
@@ -225,13 +243,15 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="0.15*" MinWidth="150"/>
                     </Grid.ColumnDefinitions>
-
+                    
+                    <!--MainView and Templates-->
                     <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.15*" MinHeight="70"/>
+                            <RowDefinition Height="0.15*" MinHeight="85"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*" MinHeight="150"/>
                         </Grid.RowDefinitions>
+                        <!--Templates list-->
                         <ListBox Grid.Row="0" ItemsSource="{Binding Path=ActionTemplates}" ItemTemplate="{StaticResource ActionTemplate}">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -239,10 +259,13 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
+                        
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                        
+                        <!--MainView-->
                         <Border Grid.Row="2" BorderThickness="2" BorderBrush="Black">
-                        <Grid>
-                            <Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
@@ -263,7 +286,8 @@
                     </Grid>
 
                     <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
-
+                    
+                    <!--Macros and Options-->
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" MinHeight="100"/>
@@ -287,7 +311,7 @@
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 
                         <!--Options-->
-                        <Grid Grid.Row="2" DataContext="{Binding Path=SelectedMacro.SelectedAction}">
+                        <Grid Style="{StaticResource OptionsGridStyle}" Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
@@ -304,30 +328,15 @@
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Y:"/>
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Pause:"/>
                             <TextBlock Grid.Row="4" Grid.Column="0" Text="Times:"/>
-                            <ComboBox Grid.Row="0" Margin="5 0 0 0" Grid.Column="1" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=ActionType}" />
-                            <TextBox Grid.Row="1" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=X}"/>
-                            <TextBox Grid.Row="2" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Y}"/>
-                            <TextBox Grid.Row="3" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Pause}"/>
-                            <TextBox Grid.Row="4" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=Times}"/>
+                            <ComboBox Grid.Row="0" Margin="5 0 0 0" Grid.Column="1" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction.ActionType}" />
+                            <TextBox Grid.Row="1" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.X}"/>
+                            <TextBox Grid.Row="2" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Y}"/>
+                            <TextBox Grid.Row="3" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Pause}"/>
+                            <TextBox Grid.Row="4" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Times}"/>
                         </Grid>
-                        <!--<StackPanel Grid.Row="2" DataContext="{Binding Path=SelectedMacro.SelectedAction}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Action:" MinWidth="50"/>
-                                <TextBox Text="{Binding Path=ActionType, Converter={StaticResource ActionTypeConverter}}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="X:" MinWidth="50"/>
-                                <TextBox Text="{Binding Path=X}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Y:" MinWidth="50"/>
-                                <TextBox Text="{Binding Path=Y}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Pause:" MinWidth="50"/>
-                                <TextBox Text="{Binding Path=Pause}"/>
-                            </StackPanel>
-                        </StackPanel>-->
+                        <Border Style="{StaticResource TemplateBorderStyle}" BorderThickness="2" CornerRadius="4" BorderBrush="Red" Grid.Row="2">
+                            
+                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>

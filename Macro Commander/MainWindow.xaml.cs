@@ -34,7 +34,6 @@ namespace Macro_Commander
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = ViewModel.viewModel;
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -42,16 +41,11 @@ namespace Macro_Commander
             source = HwndSource.FromHwnd(hWnd);
             source.AddHook(MsgListener);
             WinWrapper.hWnd = hWnd;
-
-            WinWrapper.RegisterKey("F1", HotKeyStatus.DoubleClick); // temp!!!
-            WinWrapper.RegisterKey("F2", HotKeyStatus.ShortClick); // temp!!!
-            WinWrapper.RegisterKey("F3", HotKeyStatus.LongClick); // temp!!!
-            WinWrapper.RegisterKey("F4", HotKeyStatus.Pause); // temp!!!
-            WinWrapper.RegisterKey("F5", HotKeyStatus.Start); // temp!!!
+            this.DataContext = ViewModel.viewModel;
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            WinWrapper.UnregisterKey(0);
+            WinWrapper.UnregisterAll();
         }
 
         //Methods
@@ -65,39 +59,37 @@ namespace Macro_Commander
                 case WM_HOTKEY:
                     var l = lParam.ToInt32();
                     var w = wParam.ToInt32();
-                    foreach (var item in WinWrapper.HotKeys)
+                    foreach (var key in WinWrapper.HotKeys)
                     {
-                        var value = WinWrapper.KeyDict[item.Key];
-                        var longcode = WinWrapper.VirtualKeyCodes[value];
-                        if (l == value || l == longcode || w == value || w == longcode)
+                        int shortcode = WinWrapper.KeyDict[key.Key];
+                        int longcode = WinWrapper.VirtualKeyCodes[shortcode];
+                        if(l == shortcode || w == shortcode || l == longcode || w == longcode)
                         {
-                            var x = System.Windows.Forms.Cursor.Position;
-                            switch (item.Status)
+                            switch (key.KeyStatus)
                             {
-                                case HotKeyStatus.ShortClick:
-                                    //WinWrapper.Click((uint)x.X, (uint)x.Y);
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 100, ActionType.LeftClick, 1, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
+                                case HotKeyStatus.AddAction:
+                                    foreach (var template in ViewModel.viewModel.ActionTemplates)
+                                    {
+                                        if(template.HotKey == key)
+                                        {
+                                            var pos = System.Windows.Forms.Cursor.Position;
+                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 48, pos.X, pos.Y)));
+                                        }
+                                    }
                                     break;
-                                case HotKeyStatus.LongClick:
-                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 1000, ActionType.LeftClick, 1, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
-                                    break;
-                                case HotKeyStatus.Pause:
-                                    ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 3000, ActionType.Pause, 0, ScreenCapture.CaptureFromScreen(64, 48, 0, 0, enu.CaptureMode.EmptyImage)));
-                                    break;
-                                case HotKeyStatus.Start:
-                                    if(ViewModel.viewModel.CommandExecuteScenarioAsync.CanExecute(null))
-                                    ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
-                                    break;
-                                case HotKeyStatus.DoubleClick:
-                                    ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)x.X, (uint)x.Y, 500, ActionType.LeftClick, 2, ScreenCapture.CaptureFromScreen(64, 48, x.X, x.Y)));
-                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
-                                    WinWrapper.Click((uint)x.X, (uint)x.Y);
+                                case HotKeyStatus.ExecuteScenario:
+                                    foreach (var scen in ViewModel.viewModel.Scenarios)
+                                    {
+                                        if (scen.HotKey.Key == key.Key)
+                                        {
+                                            ViewModel.viewModel.SelectedScenario = scen;
+                                            ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
+                                        }
+                                    }
                                     break;
                                 default:
                                     break;
                             }
-                            break;
                         }
                     }
                     break;
@@ -107,7 +99,8 @@ namespace Macro_Commander
 
             return IntPtr.Zero;
         }
-
+        
+        //Events
         private void AvailableMacros_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DataGridRow row = sender as DataGridRow;

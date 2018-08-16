@@ -12,7 +12,8 @@ namespace Macro_Commander.src
         //Fields
         private enu.ActionType _actionType;
         private int _pause;
-        private string _hotKey;
+        private HotKey _hotKey;
+        private int _times;
         //Properties
         public enu.ActionType ActionType
         {
@@ -32,21 +33,32 @@ namespace Macro_Commander.src
                 PropChanged("Pause");
             }
         }
-        public string HotKey
+        public int Times
+        {
+            get { return _times; }
+            set
+            {
+                _times = value;
+                PropChanged("Times");
+            }
+        }
+        public HotKey HotKey
         {
             get { return _hotKey; }
             set
             {
+                WinWrapper.UnregisterKey(_hotKey);
                 _hotKey = value;
                 PropChanged("HotKey");
             }
         }
         //Constructor
-        public ActionTemplate(string hotkey, int pause, enu.ActionType actionType)
+        public ActionTemplate(HotKey hotkey, int pause, enu.ActionType actionType,int times)
         {
             HotKey = hotkey;
             Pause = pause;
             ActionType = actionType;
+            Times = times;
         }
     }
 }

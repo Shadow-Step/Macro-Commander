@@ -9,29 +9,29 @@ namespace Macro_Commander.src
 {
     public class HotKey
     {
-        public Action<object> Action { get; set; }
-        public string Key;
-        public int Id;
-        public HotKeyStatus Status;
-        public Macro Macro;
+        private static int ID;
+        //Fields
+
+        //Properties
+        public enu.HotKeyStatus KeyStatus { get; set; }
+        public string Key { get; set; }
+        public int Id { get; set; }
 
         //Constructor
-        public HotKey(string Key, int Id, HotKeyStatus Status)
+        private HotKey()
         {
-            this.Key = Key;
-            this.Id = Id;
-            this.Status = Status;
+            
         }
-        public HotKey(string Key,int Id, Macro Macro)
-        {
-            this.Key = Key;
-            this.Id = Id;
-            this.Macro = Macro;
-        }
-        public HotKey(string Key,Action<object>action)
-        {
 
-        }
         //Methods
+        public static HotKey CreateHotKey(string key, enu.HotKeyStatus status)
+        {
+            HotKey temp = new HotKey();
+            temp.KeyStatus = status;
+            temp.Key = key;
+            temp.Id = ID++;
+            WinWrapper.RegisterKey(temp);
+            return temp;
+        }
     }
 }

@@ -78,22 +78,38 @@ namespace Macro_Commander.src
             mouse_event(MOUSE_BUTTONUP, 0, 0, 0, IntPtr.Zero);
         }
 
-        public static void RegisterKey(string key)
+        public static void RegisterKey(HotKey key)
         {
-            RegisterHotKey(hWnd, 0, 0, KeyDict[key]);
+            var exist = from k in HotKeys where k.Key == key.Key select k;
+            if(exist.Count() > 0)
+            {
+                UnregisterKey(exist.First());
+            }
+            var result = RegisterHotKey(hWnd, key.Id, 0, KeyDict[key.Key]);
+            HotKeys.Add(key);
         }
-        public static void RegisterKey(string Key,HotKeyStatus status)
-        {
-            var x = RegisterHotKey(hWnd, 0, 0, KeyDict[Key]);
-            HotKeys.Add(new HotKey(Key, 0, status));
-        }
-        public static void UnregisterKey(int id)
+        public static void UnregisterKey(HotKey key)
         {
             if (hWnd != null)
-                UnregisterHotKey(hWnd, id);
+            {
+                if (key == null)
+                    return;
+                var x = UnregisterHotKey(hWnd, key.Id);
+                HotKeys.Remove(key);
+            }
             else
                 throw new Exception("hWnd is null");
 
+        }
+        public static void UnregisterAll()
+        {
+            if (hWnd == null)
+                throw new Exception();
+            foreach (var item in HotKeys)
+            {
+                UnregisterHotKey(hWnd, item.Id);
+            }
+            HotKeys.Clear();
         }
     }
 }

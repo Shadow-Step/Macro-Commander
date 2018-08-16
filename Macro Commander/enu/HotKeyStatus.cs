@@ -8,10 +8,7 @@ namespace Macro_Commander.enu
 {
     public enum HotKeyStatus
     {
-        ShortClick,
-        LongClick,
-        DoubleClick,
-        Pause,
-        Start
+        AddAction,
+        ExecuteScenario,
     }
 }
