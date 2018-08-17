@@ -29,6 +29,7 @@ namespace Macro_Commander.src
         private ObservableCollection<ActionTemplate> _actionTemplates;
         private Macro _selectedMacro;
         private Scenario _selectedScenario;
+        private ActionTemplate _selectedTemplate;
         private string _projectPath;
         private bool _executionStarted;
         //Properties
@@ -95,6 +96,19 @@ namespace Macro_Commander.src
                 PropChanged("ExecutionStarted");
             }
         }
+        public ActionTemplate SelectedTemplate
+        {
+            get { return _selectedTemplate; }
+            set
+            {
+                _selectedTemplate = value;
+                PropChanged("SelectedTemplate");
+            }
+        }
+        public bool EditTemplate
+        {
+            get { return SelectedTemplate != null; }
+        }
         //Commands
         public RelayCommand CommandAddMacro { get; set; }
         public RelayCommand CommandDelMacro { get; set; }
@@ -103,6 +117,7 @@ namespace Macro_Commander.src
         public RelayCommand CommandAddScenario { get; set; }
         public RelayCommand CommandDelScenario { get; set; }
         public RelayCommand CommandExecuteScenarioAsync { get; set; }
+        public RelayCommand CommandApplyTemplateChanges { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -112,6 +127,7 @@ namespace Macro_Commander.src
             CommandLoadFromFile = new RelayCommand(LoadFromFile);
             CommandAddScenario = new RelayCommand(AddScenario);
             CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
+            CommandApplyTemplateChanges = new RelayCommand(ApplyTemplateChanges);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
@@ -119,10 +135,11 @@ namespace Macro_Commander.src
             ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F2", enu.HotKeyStatus.AddAction), 500, enu.ActionType.RightClick, 1));
             ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F3", enu.HotKeyStatus.AddAction), 500, enu.ActionType.LeftClick, 2));
             ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F4", enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
+            ActionTemplates.Last().PlaceHolder = true;
         }
         //Methods
         
-       
         //Commands
         private void AddMacro(object param)
         {
@@ -173,6 +190,16 @@ namespace Macro_Commander.src
         {
             Scenarios.Add(new Scenario());
             SelectedScenario = Scenarios.Last();
+        }
+        private void ApplyTemplateChanges(object param)
+        {
+            if(SelectedTemplate.PlaceHolder)
+            {
+                SelectedTemplate.PlaceHolder = false;
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
+                ActionTemplates.Last().PlaceHolder = true;
+            }
+            SelectedTemplate = null;
         }
         private async void ExecuteScenarioAsync(object param)
         {

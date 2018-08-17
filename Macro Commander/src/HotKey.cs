@@ -30,6 +30,7 @@ namespace Macro_Commander.src
             temp.KeyStatus = status;
             temp.Key = key;
             temp.Id = ID++;
+            if(key != null)
             WinWrapper.RegisterKey(temp);
             return temp;
         }

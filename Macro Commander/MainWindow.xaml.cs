@@ -115,5 +115,11 @@ namespace Macro_Commander
             if (ViewModel.viewModel.SelectedScenario.CommandDelMacro.CanExecute(item))
                 ViewModel.viewModel.SelectedScenario.CommandDelMacro.Execute(item);
         }
+        private void TemplateItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+            ViewModel.viewModel.SelectedTemplate = (sender as ListBoxItem).Content as ActionTemplate;
+            
+        }
     }
 }

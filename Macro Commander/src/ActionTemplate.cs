@@ -14,6 +14,7 @@ namespace Macro_Commander.src
         private int _pause;
         private HotKey _hotKey;
         private int _times;
+        private bool _placeHolder;
         //Properties
         public enu.ActionType ActionType
         {
@@ -52,6 +53,7 @@ namespace Macro_Commander.src
                 PropChanged("HotKey");
             }
         }
+        public bool PlaceHolder { get; set; }
         //Constructor
         public ActionTemplate(HotKey hotkey, int pause, enu.ActionType actionType,int times)
         {
@@ -60,5 +62,7 @@ namespace Macro_Commander.src
             ActionType = actionType;
             Times = times;
         }
+        
+        //Methods
     }
 }
