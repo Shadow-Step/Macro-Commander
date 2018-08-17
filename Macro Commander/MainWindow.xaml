@@ -81,22 +81,6 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="TemplateBorderStyle" TargetType="Border">
-            <Setter Property="Visibility" Value="Collapsed"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Path=ExecutionStarted}" Value="True">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="OptionsGridStyle" TargetType="Grid">
-            <Setter Property="Visibility" Value="Visible"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Path=ExecutionStarted}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
             <Border Name="Brd" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" BorderThickness="1">
                 <ContentPresenter RecognizesAccessKey="True"  Margin="{TemplateBinding Padding}"></ContentPresenter>
@@ -129,7 +113,7 @@
             
         </ToolBar>
         <TabControl Grid.Row="2" Margin="15 5 15 5">
-            <!--Scenario-->
+            <!--Scenario TAB-->
             <TabItem Header="Scenarios">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -235,7 +219,7 @@
                     <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5"/>
                 </Grid>
             </TabItem>
-            <!--Macro-->
+            <!--Macro TAB-->
             <TabItem Header="Macro Constructor">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -311,7 +295,7 @@
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 
                         <!--Options-->
-                        <Grid Style="{StaticResource OptionsGridStyle}" Grid.Row="2">
+                        <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
@@ -334,9 +318,7 @@
                             <TextBox Grid.Row="3" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Pause}"/>
                             <TextBox Grid.Row="4" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Times}"/>
                         </Grid>
-                        <Border Style="{StaticResource TemplateBorderStyle}" BorderThickness="2" CornerRadius="4" BorderBrush="Red" Grid.Row="2">
                             
-                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>
