@@ -55,6 +55,34 @@
                 </StackPanel>
             </Border>
         </DataTemplate>
+        <DataTemplate x:Key="ActionTemplateEditing">
+            <Border Width="125" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
+                <Grid Margin="2 2 2 2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    
+                    <ComboBox Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=ActionType}"/>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="HotKey:"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Pause:"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Clicks:"/>
+                    
+
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyUp="ActionTemplateHotKeyInit"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Pause}"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Times}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
         <DataTemplate x:Key="ActionTemplatePlaceHolder">
             <Border Width="125" Height="64" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
                 
@@ -102,6 +130,11 @@
         <Style x:Key="TemplateOriginStyle" TargetType="ListBoxItem">
             <Setter Property="ContentTemplate" Value="{StaticResource ActionTemplateOrigin}"/>
             <EventSetter Event="MouseDoubleClick" Handler="TemplateItem_MouseDoubleClick"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=EditingMode}" Value="True">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ActionTemplateEditing}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="TemplatePlaceHolderStyle" TargetType="ListBoxItem">
             <Setter Property="ContentTemplate" Value="{StaticResource ActionTemplatePlaceHolder}"/>
@@ -265,12 +298,24 @@
                     <!--MainView and Templates-->
                     <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.15*" MinHeight="85"/>
+                            <RowDefinition>
+                                <RowDefinition.Style>
+                                    <Style TargetType="RowDefinition">
+                                        <Setter Property="Height" Value="0.15*"/>
+                                        <Setter Property="MinHeight" Value="95"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=SelectedTemplate.EditingMode}" Value="True">
+                                                <Setter Property="MinHeight" Value="150"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RowDefinition.Style>
+                            </RowDefinition>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*" MinHeight="150"/>
                         </Grid.RowDefinitions>
                         <!--Templates list-->
-                        <ListBox Grid.Row="0" ItemsSource="{Binding Path=ActionTemplates}">
+                        <ListBox Grid.Row="0" ItemsSource="{Binding Path=ActionTemplates}" SelectedItem="{Binding Path=SelectedTemplate}">
                             <ListBox.ItemContainerStyleSelector>
                                 <local:ActionTemplateStyleSelector TemplateOriginStyle="{StaticResource TemplateOriginStyle}" TemplatePlaceHolderStyle="{StaticResource TemplatePlaceHolderStyle}"/>
                             </ListBox.ItemContainerStyleSelector>
@@ -283,7 +328,7 @@
                         
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                         
-                        <!--MainView and Template menu-->
+                        <!--MainView-->
                         <Border Grid.Row="2" BorderThickness="2" BorderBrush="Black">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -297,46 +342,13 @@
                                 </Menu>
                                 <!--MainView List-->
                                 <ListBox Grid.Row="1" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedMacro.Actions}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel/>
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
                                 </ListBox>
-                                <!--Template box-->
-                                <Grid Style="{StaticResource TemplateGridStyle}" Grid.Row="1" Margin="0 15 0 15">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.50*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="0.50*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <GroupBox Grid.Column="1" Background="LightGray">
-                                        <GroupBox.Header>
-                                            <TextBlock FontSize="14" FontWeight="Bold" Text="Template"/>
-                                        </GroupBox.Header>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Action:"/>
-                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Pause:"/>
-                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Times:"/>
-                                            <ComboBox Grid.Row="0" Margin="5 0 0 0" Grid.Column="1" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=SelectedTemplate.ActionType}" />
-                                            <TextBox Grid.Row="1" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedTemplate.Pause}"/>
-                                            <TextBox Grid.Row="2" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedTemplate.Times}"/>
-                                            <Button Content="Apply" Grid.Column="0" Grid.Row="3" Command="{Binding Path=CommandApplyTemplateChanges}"/>
-                                        </Grid>
-                                    </GroupBox>
-                                </Grid>
-                        </Grid>
+                            </Grid>
                         </Border>
                     </Grid>
 

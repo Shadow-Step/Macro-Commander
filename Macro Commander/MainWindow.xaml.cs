@@ -118,15 +118,22 @@ namespace Macro_Commander
         private void TemplateItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (((sender as ListBoxItem).Content as ActionTemplate).PlaceHolder)
-                ViewModel.viewModel.SelectedTemplate = new ActionTemplate() { PlaceHolder = true };
+            {
+                ViewModel.viewModel.CommandAddTemplate.Execute(null);
+            }
             else
-                ViewModel.viewModel.SelectedTemplate = (sender as ListBoxItem).Content as ActionTemplate;
+                ViewModel.viewModel.SelectedTemplate.EditingMode = true;
         }
 
         private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if(ViewModel.viewModel.SelectedScenario != null)
             ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(e.Key.ToString(), HotKeyStatus.ExecuteScenario);
+        }
+        private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (ViewModel.viewModel.SelectedTemplate != null)
+                ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(e.Key.ToString(), HotKeyStatus.AddAction);
         }
     }
 }

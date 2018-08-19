@@ -32,6 +32,7 @@ namespace Macro_Commander.src
         private ActionTemplate _selectedTemplate;
         private string _projectPath;
         private bool _executionStarted;
+        
         //Properties
         public ObservableCollection<Macro> MacroList
         {
@@ -101,6 +102,8 @@ namespace Macro_Commander.src
             get { return _selectedTemplate; }
             set
             {
+                if(SelectedTemplate != null && SelectedTemplate.EditingMode == true)
+                _selectedTemplate.EditingMode = false;
                 _selectedTemplate = value;
                 PropChanged("SelectedTemplate");
             }
@@ -109,6 +112,7 @@ namespace Macro_Commander.src
         {
             get { return SelectedTemplate != null; }
         }
+        
         //Commands
         public RelayCommand CommandAddMacro { get; set; }
         public RelayCommand CommandDelMacro { get; set; }
@@ -118,6 +122,7 @@ namespace Macro_Commander.src
         public RelayCommand CommandDelScenario { get; set; }
         public RelayCommand CommandExecuteScenarioAsync { get; set; }
         public RelayCommand CommandApplyTemplateChanges { get; set; }
+        public RelayCommand CommandAddTemplate { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -128,6 +133,7 @@ namespace Macro_Commander.src
             CommandAddScenario = new RelayCommand(AddScenario);
             CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
             CommandApplyTemplateChanges = new RelayCommand(ApplyTemplateChanges);
+            CommandAddTemplate = new RelayCommand(AddTemplate);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
@@ -191,13 +197,14 @@ namespace Macro_Commander.src
             Scenarios.Add(new Scenario());
             SelectedScenario = Scenarios.Last();
         }
+        private void AddTemplate(object param)
+        {
+            ActionTemplate newTemplate = new ActionTemplate { EditingMode = true };
+            SelectedTemplate = newTemplate;
+            ActionTemplates.Insert(ActionTemplates.Count - 1, newTemplate);
+        }
         private void ApplyTemplateChanges(object param)
         {
-            if(SelectedTemplate.PlaceHolder)
-            {
-                SelectedTemplate.PlaceHolder = false;
-                ActionTemplates.Insert(ActionTemplates.Count - 1, SelectedTemplate);
-            }
             SelectedTemplate = null;
         }
         private void ApplyTemplateAdding(object param)

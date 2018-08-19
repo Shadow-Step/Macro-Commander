@@ -15,6 +15,7 @@ namespace Macro_Commander.src
         private HotKey _hotKey;
         private int _times;
         private bool _placeHolder;
+        private bool _editingMode;
         //Properties
         public enu.ActionType ActionType
         {
@@ -54,6 +55,15 @@ namespace Macro_Commander.src
             }
         }
         public bool PlaceHolder { get; set; }
+        public bool EditingMode
+        {
+            get { return _editingMode; }
+            set
+            {
+                _editingMode = value;
+                PropChanged("EditingMode");
+            }
+        }
         //Constructor
         public ActionTemplate()
         {
