@@ -22,7 +22,7 @@ namespace Macro_Commander
             var param = int.Parse(parameter as string);
             if (key == null)
                 throw new Exception();
-            return param == 0 ? src.HotKey.CreateHotKey(key, enu.HotKeyStatus.AddAction) : src.HotKey.CreateHotKey(key, enu.HotKeyStatus.ExecuteScenario);
+            return param == 0 ? src.HotKey.CreateHotKey(enu.HotKeyStatus.AddAction,key) : src.HotKey.CreateHotKey(enu.HotKeyStatus.ExecuteScenario, key);
         }
     }
 }

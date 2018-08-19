@@ -15,6 +15,7 @@ namespace Macro_Commander.src
         //Properties
         public enu.HotKeyStatus KeyStatus { get; set; }
         public string Key { get; set; }
+        public string Modifier { get; set; }
         public int Id { get; set; }
 
         //Constructor
@@ -24,11 +25,12 @@ namespace Macro_Commander.src
         }
 
         //Methods
-        public static HotKey CreateHotKey(string key, enu.HotKeyStatus status)
+        public static HotKey CreateHotKey(enu.HotKeyStatus status,string key,string modifier = null)
         {
             HotKey temp = new HotKey();
             temp.KeyStatus = status;
             temp.Key = key;
+            temp.Modifier = modifier;
             temp.Id = ID++;
             if(key != null)
             WinWrapper.RegisterKey(temp);
