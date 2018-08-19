@@ -132,6 +132,8 @@ namespace Macro_Commander.src
 
         public static void RegisterKey(HotKey key)
         {
+            if (key == null || key.Key == null)
+                return;
             var exist = from k in HotKeys where k.Key == key.Key select k;
             if(exist.Count() > 0)
             {
@@ -148,6 +150,7 @@ namespace Macro_Commander.src
                     return;
                 var x = UnregisterHotKey(hWnd, key.Id);
                 HotKeys.Remove(key);
+                HotKey.IdSet.Remove(key.Id);
             }
             else
                 throw new Exception("hWnd is null");
