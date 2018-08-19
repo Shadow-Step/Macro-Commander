@@ -108,10 +108,6 @@ namespace Macro_Commander.src
                 PropChanged("SelectedTemplate");
             }
         }
-        public bool EditTemplate
-        {
-            get { return SelectedTemplate != null; }
-        }
         
         //Commands
         public RelayCommand CommandAddMacro { get; set; }
@@ -121,8 +117,9 @@ namespace Macro_Commander.src
         public RelayCommand CommandAddScenario { get; set; }
         public RelayCommand CommandDelScenario { get; set; }
         public RelayCommand CommandExecuteScenarioAsync { get; set; }
-        public RelayCommand CommandApplyTemplateChanges { get; set; }
+        public RelayCommand CommandStartStopEditTemplate { get; set; }
         public RelayCommand CommandAddTemplate { get; set; }
+        public RelayCommand CommandDelTemplate { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -132,16 +129,17 @@ namespace Macro_Commander.src
             CommandLoadFromFile = new RelayCommand(LoadFromFile);
             CommandAddScenario = new RelayCommand(AddScenario);
             CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
-            CommandApplyTemplateChanges = new RelayCommand(ApplyTemplateChanges);
+            CommandStartStopEditTemplate = new RelayCommand(StartStopEditTemplate);
             CommandAddTemplate = new RelayCommand(AddTemplate);
+            CommandDelTemplate = new RelayCommand(DelTemplate);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F1",enu.HotKeyStatus.AddAction), 500, enu.ActionType.LeftClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F2", enu.HotKeyStatus.AddAction), 500, enu.ActionType.RightClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F3", enu.HotKeyStatus.AddAction), 500, enu.ActionType.LeftClick, 2));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey("F4", enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.LeftClick, 1));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.RightClick, 1));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.LeftClick, 2));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.Pause, 0));
+            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.Pause, 0));
             ActionTemplates.Last().PlaceHolder = true;
         }
         //Methods
@@ -172,6 +170,7 @@ namespace Macro_Commander.src
         }
         private void SaveToFile(object param)
         {
+            StartStopEditTemplate(null);
             ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
@@ -181,13 +180,23 @@ namespace Macro_Commander.src
         }
         private void LoadFromFile(object param)
         {
+            StartStopEditTemplate(null);
             BinaryFormatter formatter = new BinaryFormatter();
+            WinWrapper.UnregisterAll();
             using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
             {
                 ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
                 MacroList = args.MacroList;
                 Scenarios = args.Scenarios;
+                foreach (var action in Scenarios)
+                {
+                    WinWrapper.RegisterKey(action.HotKey);
+                }
                 ActionTemplates = args.ActionTemplates;
+                foreach (var action in ActionTemplates)
+                {
+                    WinWrapper.RegisterKey(action.HotKey);
+                }
                 SelectedMacro = args.SelectedMacro;
                 SelectedScenario = args.SelectedScenario;
             }
@@ -199,17 +208,35 @@ namespace Macro_Commander.src
         }
         private void AddTemplate(object param)
         {
-            ActionTemplate newTemplate = new ActionTemplate { EditingMode = true };
-            SelectedTemplate = newTemplate;
+            ActionTemplate newTemplate = new ActionTemplate();
             ActionTemplates.Insert(ActionTemplates.Count - 1, newTemplate);
+            SelectedTemplate = newTemplate;
+            SelectedTemplate.EditingMode = true;
         }
-        private void ApplyTemplateChanges(object param)
+        private void StartStopEditTemplate(object param)
         {
-            SelectedTemplate = null;
+            if (param == null)
+                SelectedTemplate = null;
+            else
+            {
+                var template = param as ActionTemplate;
+                if (template == null)
+                    throw new Exception();
+                template.EditingMode = true;
+            }
         }
-        private void ApplyTemplateAdding(object param)
+        private void DelTemplate(object param)
         {
-
+            if (param is ActionTemplate action && action != null)
+            {
+                if (action.PlaceHolder == true)
+                    return;
+                var index = ActionTemplates.IndexOf(action);
+                ActionTemplates.Remove(action);
+                StartStopEditTemplate(null);
+            }
+            else
+                throw new Exception();
         }
         private async void ExecuteScenarioAsync(object param)
         {

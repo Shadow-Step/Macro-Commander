@@ -46,7 +46,7 @@
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="ActionTemplateOrigin">
-            <Border Width="125" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
+            <Border Width="125" Height="70" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
                 <StackPanel Orientation="Vertical" Margin="2 0 2 0">
                     <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Action: {0}, Path=ActionType}"/>
                     <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=HotKey: {0}, Path=HotKey,Converter={StaticResource HotKeyConverter}}"/>
@@ -75,19 +75,19 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="HotKey:"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Pause:"/>
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Clicks:"/>
-                    
 
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyUp="ActionTemplateHotKeyInit"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyDown="ActionTemplateHotKeyDown" KeyUp="ActionTemplateHotKeyInit"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Pause}"/>
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Times}"/>
+
+                    <Button Content="Accept" Grid.Row="4" Margin="0 5 0 0" Click="AcceptActionTemplateChanges"/>
                 </Grid>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="ActionTemplatePlaceHolder">
-            <Border Width="125" Height="64" CornerRadius="4" BorderThickness="2" BorderBrush="{Binding Path=ActionType, Converter={StaticResource BorderBrushConverter}}" Margin="2 2 2 2">
-                
-                    <TextBlock FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Text="New"/>
-                
+            <Border Width="125" Height="70" CornerRadius="4" BorderThickness="2" BorderBrush="#2d2d2d" Margin="2 2 2 2">
+                <TextBlock FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Text="New"/>
             </Border>
         </DataTemplate>
         
@@ -154,7 +154,7 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-
+        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -187,7 +187,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
 
-                    <!-- DataGrids Grid-->
+                    <!-- Macros tables Grid-->
                     <Border BorderThickness="2" BorderBrush="Black" Grid.Column="0" Grid.Row="0">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -244,7 +244,7 @@
                                 <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <Button Content="Add" Grid.Row="1" Command="{Binding Path=CommandAddScenario}"/>
+                        <Button Content="Add" MaxWidth="100" Grid.Row="1" Margin="0 5 0 5" Command="{Binding Path=CommandAddScenario}"/>
                     </Grid>
                     <!-- Preview List Grid-->
                     <ListBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedScenario.PreviewMacro.Actions}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -324,6 +324,13 @@
                                     <WrapPanel/>
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete" Command="{Binding Path=CommandDelTemplate}" CommandParameter="{Binding Path=SelectedTemplate}"/>
+                                    <MenuItem Header="Edit" Command="{Binding Path=CommandStartStopEditTemplate}" CommandParameter="{Binding Path=SelectedTemplate}"/>
+                                    <MenuItem Header="Add New" Command="{Binding Path=CommandAddTemplate}"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                         
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>

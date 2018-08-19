@@ -54,7 +54,15 @@ namespace Macro_Commander.src
                 PropChanged("HotKey");
             }
         }
-        public bool PlaceHolder { get; set; }
+        public bool PlaceHolder
+        {
+            get { return _placeHolder; }
+            set
+            {
+                _placeHolder = value;
+                PropChanged("PlaceHolder");
+            }
+        }
         public bool EditingMode
         {
             get { return _editingMode; }

@@ -26,6 +26,7 @@ namespace Macro_Commander
     /// </summary>
     public partial class MainWindow : Window
     {
+        Key[] KeyList = new Key[2] { Key.None,Key.None};
         //Fields
         IntPtr hWnd = IntPtr.Zero;
         HwndSource source;
@@ -127,13 +128,28 @@ namespace Macro_Commander
 
         private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            Keyboard.ClearFocus();
             if(ViewModel.viewModel.SelectedScenario != null)
-            ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(e.Key.ToString(), HotKeyStatus.ExecuteScenario);
+            ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, e.Key.ToString());
         }
         private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            Keyboard.ClearFocus();
             if (ViewModel.viewModel.SelectedTemplate != null)
-                ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(e.Key.ToString(), HotKeyStatus.AddAction);
+                ViewModel.viewModel.SelectedTemplate.HotKey = KeyList[1] == Key.None ? 
+                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[0].ToString()) : 
+                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0].ToString());
+        }
+        private void ActionTemplateHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (KeyList[0] == Key.None)
+                KeyList[0] = e.Key;
+            else
+                KeyList[1] = e.Key;
+        }
+        private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
+        {
+            ViewModel.viewModel.CommandStartStopEditTemplate.Execute(null);
         }
     }
 }
