@@ -69,7 +69,7 @@ namespace Macro_Commander.src
         {
             Pause = 0;
             Times = 0;
-            HotKey = HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction);
+            HotKey = HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null);
             PlaceHolder = false;
             ActionType = enu.ActionType.LeftClick;
         }
