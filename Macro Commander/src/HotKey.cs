@@ -7,9 +7,11 @@ using Macro_Commander.enu;
 
 namespace Macro_Commander.src
 {
+    [Serializable]
     public class HotKey
     {
-        private static int ID;
+        [NonSerialized]
+        public static SortedSet<int> IdSet = new SortedSet<int>();
         //Fields
 
         //Properties
@@ -31,7 +33,17 @@ namespace Macro_Commander.src
             temp.KeyStatus = status;
             temp.Key = key;
             temp.Modifier = modifier;
-            temp.Id = ID++;
+            for (int i = 0; i < 1000; i++)
+            {
+                if (!IdSet.Contains(i))
+                {
+                    IdSet.Add(i);
+                    temp.Id = i;
+                    break;
+                }
+                if (i == 999)
+                    throw new Exception();
+            }
             if(key != null)
             WinWrapper.RegisterKey(temp);
             return temp;
