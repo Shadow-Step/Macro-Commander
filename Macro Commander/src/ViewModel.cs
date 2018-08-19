@@ -170,20 +170,26 @@ namespace Macro_Commander.src
         }
         private void SaveToFile(object param)
         {
+            var path = param as string;
+            ProjectPath = path ?? throw new Exception();
+
             StartStopEditTemplate(null);
             ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
             BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
+            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 formatter.Serialize(stream, args);
             }
         }
         private void LoadFromFile(object param)
         {
+            var path = param as string;
+            ProjectPath = path ?? throw new Exception();
+
             StartStopEditTemplate(null);
             BinaryFormatter formatter = new BinaryFormatter();
             WinWrapper.UnregisterAll();
-            using (FileStream stream = new FileStream("temp.bin", FileMode.OpenOrCreate))
+            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
                 MacroList = args.MacroList;
@@ -200,6 +206,7 @@ namespace Macro_Commander.src
                 SelectedMacro = args.SelectedMacro;
                 SelectedScenario = args.SelectedScenario;
             }
+            
         }
         private void AddScenario(object param)
         {

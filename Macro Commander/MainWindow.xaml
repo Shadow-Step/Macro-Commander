@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Macro_Commander"
         xmlns:statics="clr-namespace:Macro_Commander.res"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="{Binding StringFormat=Macro Commander - {0}, Path=ProjectPath, TargetNullValue=Macro Commander}" Height="450" Width="800" Closing="Window_Closing" Loaded="Window_Loaded">
     <Window.Resources>
         <local:ColorConverter x:Key="BorderBrushConverter"/>
         <local:ActionTypeConverter x:Key="ActionTypeConverter"/>
@@ -165,9 +165,13 @@
         </Grid.RowDefinitions>
         
         <Menu Grid.Row="0" Background="LightGray">
-            <MenuItem Header="Save" Command="{Binding Path=CommandSaveToFile}"/>
-            <MenuItem Header="Load" Command="{Binding Path=CommandLoadFromFile}"/>
-            <MenuItem Header="Add Scenario" Command="{Binding Path=CommandAddScenario}"/>
+            <MenuItem Header="File">
+                <MenuItem Header="New" Click="MenuNewClick"/>
+                <MenuItem Header="Open" Click="MenuOpenClick"/>
+                <Separator/>
+                <MenuItem Header="Save" Click="MenuSaveClick"/>
+                <MenuItem Header="Save as" Click="MenuSaveAsClick"/>
+            </MenuItem>
         </Menu>
         <ToolBar Grid.Row="1" Background="LightGray">
             
@@ -342,11 +346,20 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                                <Menu Grid.Row="0" Background="LightGray">
-                                    <Button Content="&lt;" Width="20" Command="{Binding Path=SelectedMacro.CommandMoveBackwards}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
-                                    <Button Content="&gt;" Width="20" Command="{Binding Path=SelectedMacro.CommandMoveForward}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
-                                    <Button Content="|--|" Command="{Binding Path=SelectedMacro.CommandDelAction}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
-                                </Menu>
+                                <Grid Grid.Row="0" Background="LightGray">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Menu Grid.Column="0" Background="Transparent">
+                                        <Button Content="&lt;" Width="20" Command="{Binding Path=SelectedMacro.CommandMoveBackwards}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
+                                        <Button Content="&gt;" Width="20" Command="{Binding Path=SelectedMacro.CommandMoveForward}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
+                                        <Button Content="|--|" Command="{Binding Path=SelectedMacro.CommandDelAction}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
+                                    </Menu>
+                                    <TextBlock Grid.Column="1" Text="{Binding Path=SelectedMacro.Name}" FontSize="18" VerticalAlignment="Center"/>
+                                </Grid>
+                                
                                 <!--MainView List-->
                                 <ListBox Grid.Row="1" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedMacro.Actions}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                     <ListBox.ItemsPanel>
@@ -366,7 +379,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" MinHeight="100"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="0.25*" MinHeight="100"/>
+                            <RowDefinition Height="*" MinHeight="100"/>
                         </Grid.RowDefinitions>
                         
                         <!--Macros List box-->

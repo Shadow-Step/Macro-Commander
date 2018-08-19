@@ -151,5 +151,51 @@ namespace Macro_Commander
         {
             ViewModel.viewModel.CommandStartStopEditTemplate.Execute(null);
         }
+
+        private void MenuNewClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void MenuOpenClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.RestoreDirectory = true;
+            fileDialog.Filter = "Project file (*.mcp)|*mcp";
+            if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                ViewModel.viewModel.CommandLoadFromFile.Execute(fileDialog.FileName);
+            }
+
+        }
+        private void MenuSaveClick(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.viewModel.ProjectPath == null)
+            {
+                SaveFileDialog saveFile = new SaveFileDialog();
+                saveFile.RestoreDirectory = true;
+                saveFile.Filter = "Project file (*.mcp)|*mcp";
+                saveFile.DefaultExt = ".mcp";
+                if (saveFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    ViewModel.viewModel.CommandSaveToFile.Execute(saveFile.FileName);
+                }
+            }
+            else
+            {
+                ViewModel.viewModel.CommandSaveToFile.Execute(ViewModel.viewModel.ProjectPath);
+            }
+
+        }
+        private void MenuSaveAsClick(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.RestoreDirectory = true;
+            saveFile.Filter = "Project file (*.mcp)|*mcp";
+            saveFile.DefaultExt = ".mcp";
+            if (saveFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                ViewModel.viewModel.CommandSaveToFile.Execute(saveFile.FileName);
+            }
+        }
     }
 }
