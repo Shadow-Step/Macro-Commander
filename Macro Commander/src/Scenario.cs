@@ -125,6 +125,7 @@ namespace Macro_Commander.src
             CommandMoveMacroUp = new RelayCommand(MoveMacroUp);
             CommandMoveMacroDown = new RelayCommand(MoveMacroDown);
             ExecutionMode = enu.ExecutionMode.Single;
+            Name = "New Scenario";
         }
 
         //Commands

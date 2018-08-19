@@ -196,10 +196,13 @@ namespace Macro_Commander.src
             if(SelectedTemplate.PlaceHolder)
             {
                 SelectedTemplate.PlaceHolder = false;
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction), 3000, enu.ActionType.Pause, 0));
-                ActionTemplates.Last().PlaceHolder = true;
+                ActionTemplates.Insert(ActionTemplates.Count - 1, SelectedTemplate);
             }
             SelectedTemplate = null;
+        }
+        private void ApplyTemplateAdding(object param)
+        {
+
         }
         private async void ExecuteScenarioAsync(object param)
         {

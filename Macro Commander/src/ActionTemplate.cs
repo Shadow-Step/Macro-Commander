@@ -55,6 +55,14 @@ namespace Macro_Commander.src
         }
         public bool PlaceHolder { get; set; }
         //Constructor
+        public ActionTemplate()
+        {
+            Pause = 0;
+            Times = 0;
+            HotKey = HotKey.CreateHotKey(null, enu.HotKeyStatus.AddAction);
+            PlaceHolder = false;
+            ActionType = enu.ActionType.LeftClick;
+        }
         public ActionTemplate(HotKey hotkey, int pause, enu.ActionType actionType,int times)
         {
             HotKey = hotkey;
