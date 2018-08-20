@@ -18,11 +18,11 @@ namespace Macro_Commander
             {
                 switch (action)
                 {
-                    case ActionType.LeftClick:
+                    case ActionType.MouseLeftButtonClick:
                         return "LimeGreen";
-                    case ActionType.RightClick:
+                    case ActionType.MouseRightButtonClick:
                         return "Magenta";
-                    case ActionType.Pause:
+                    case ActionType.MouseMove:
                         return "Aqua";
                 }
             }
