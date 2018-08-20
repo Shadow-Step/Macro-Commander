@@ -35,15 +35,42 @@ namespace Macro_Commander
         //Window
         public MainWindow()
         {
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start InitializeComponent");
+#endif
             InitializeComponent();
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("End InitializeComponent");
+#endif
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start Window_Loaded");
+#endif
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start hWndInit");
+#endif
             hWnd = new WindowInteropHelper(this).Handle;
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start getting Source");
+#endif
             source = HwndSource.FromHwnd(hWnd);
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start Hook Adding");
+#endif
             source.AddHook(MsgListener);
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start hWnd attach");
+#endif
             WinWrapper.hWnd = hWnd;
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("Start DataContext attach");
+#endif
             this.DataContext = ViewModel.viewModel;
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog("End Window_Loaded");
+#endif
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -138,7 +165,7 @@ namespace Macro_Commander
         {
             if (((sender as ListBoxItem).Content as ActionTemplate).PlaceHolder)
             {
-                ViewModel.viewModel.CommandAddTemplate.Execute(null);
+                ViewModel.viewModel.CommandAddItemToList.Execute("ActionTemplate");
             }
             else
                 ViewModel.viewModel.SelectedTemplate.EditingMode = true;
@@ -221,7 +248,7 @@ namespace Macro_Commander
         }
         private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
         {
-            ViewModel.viewModel.CommandStartStopEditTemplate.Execute(null);
+            ViewModel.viewModel.CommandEditItem.Execute(ViewModel.viewModel.SelectedTemplate);
         }
 
         private void MenuNewClick(object sender, RoutedEventArgs e)
@@ -283,12 +310,19 @@ namespace Macro_Commander
                 ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
             }
         }
+        private void EditScenarioNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
+            }
+        }
         private void MacrosListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if(e.Key == Key.Delete)
             {
                 if (ViewModel.viewModel.SelectedMacro != null)
-                    ViewModel.viewModel.CommandDelMacro.Execute(ViewModel.viewModel.SelectedMacro);
+                    ViewModel.viewModel.CommandRemoveItemFromList.Execute(ViewModel.viewModel.SelectedMacro);
             }
         }
 

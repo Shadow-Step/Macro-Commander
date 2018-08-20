@@ -164,14 +164,18 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-        
+
+        <Style x:Key="ToolBarButton" TargetType="Button">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="22"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         
         <Menu Grid.Row="0" Background="LightGray">
@@ -185,7 +189,11 @@
             <MenuItem Header="Help" Click="ShowHelpWindow"/>
         </Menu>
         <ToolBar Grid.Row="1" Background="LightGray">
-            
+            <Button Style="{StaticResource ToolBarButton}" Content="N"/>
+            <Button Style="{StaticResource ToolBarButton}" Content="L"/>
+            <Button Style="{StaticResource ToolBarButton}" Content="S"/>
+            <Button Style="{StaticResource ToolBarButton}" Content="Sa"/>
+            <Separator/>
         </ToolBar>
         <TabControl Grid.Row="2" Margin="15 5 15 5">
             <!--Scenario TAB-->
@@ -228,7 +236,8 @@
                                 <TextBlock Grid.Column="1" Text="{Binding Path=SelectedScenario.Name}" FontSize="18"/>
                             </Grid>
                             <!--Scenario macros-->
-                            <DataGrid Grid.Column="0" SelectionMode="Single" Grid.Row="1" CanUserSortColumns="False" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=SelectedScenario.MacroList}" SelectedIndex="{Binding Path=SelectedScenario.SelectedIndex}">
+                            <GroupBox Header="Scenario macros" Grid.Column="0" Grid.Row="1">
+                                <DataGrid Margin="3 3 3 3" SelectionMode="Single" CanUserSortColumns="False" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=SelectedScenario.MacroList}" SelectedIndex="{Binding Path=SelectedScenario.SelectedIndex}">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridRow">
                                         <EventSetter Event="MouseDoubleClick" Handler="ScenarioMacros_MouseDoubleClick"/>
@@ -245,9 +254,12 @@
                                     <DataGridTextColumn Header="Execution Time" Binding="{Binding Path=TotalExecutionTime}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                            </GroupBox>
+                            
                             <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5"/>
                             <!--Available macros-->
-                            <DataGrid Grid.Column="2" Grid.Row="1" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro}">
+                            <GroupBox Margin="3 3 3 3" Header="Available macros" Grid.Column="2" Grid.Row="1">
+                                <DataGrid CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro}">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridRow">
                                         <EventSetter Event="MouseDoubleClick" Handler="AvailableMacros_MouseDoubleClick"/>
@@ -264,31 +276,61 @@
                                     <DataGridTextColumn Header="Execution Time" Binding="{Binding Path=TotalExecutionTime}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                            </GroupBox>
                         </Grid>
                     </Border>
                     <!-- Scenarios Grid -->
-                    <Grid Grid.Row="0" Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <DataGrid RowStyle="{StaticResource DataGridSelectedRowStyle}" AutoGenerateColumns="False" Grid.Row="0" HeadersVisibility="None" ItemsSource="{Binding Path=Scenarios}" SelectedItem="{Binding Path=SelectedScenario}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Button Content="Add" MaxWidth="100" Grid.Row="1" Margin="0 5 0 5" Command="{Binding Path=CommandAddScenario}"/>
+                    <GroupBox Header="Scenarios" Grid.Row="0" Grid.Column="2">
+                        <Grid Margin="3 3 3 3">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <ListBox Grid.Row="0" ItemsSource="{Binding Path=Scenarios}" SelectedItem="{Binding Path=SelectedScenario}">
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Add" Command="{Binding Path=CommandAddItemToList}" CommandParameter="Scenario"/>
+                                        <MenuItem Header="Remove" Command="{Binding Path=CommandRemoveItemFromList}" CommandParameter="{Binding Path=SelectedScenario}"/>
+                                        <MenuItem Header="Rename" Command="{Binding Path=CommandEditItem}" CommandParameter="{Binding Path=SelectedScenario}"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.Resources>
+                                    <DataTemplate x:Key="OriginTemplate">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                    <DataTemplate x:Key="EditTemplate">
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}" KeyUp="EditScenarioNameTextBox_KeyUp"/>
+                                    </DataTemplate>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource OriginTemplate}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding Path=EditingMode}" Value="True">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource EditTemplate}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.Resources>
+                            </ListBox>
+                            <Button Content="Add" MaxWidth="100" Grid.Row="1" Margin="0 5 0 5" Command="{Binding Path=CommandAddItemToList}" CommandParameter="Scenario"/>
                     </Grid>
+                    </GroupBox>
                     <!-- Preview List Grid-->
-                    <ListBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedScenario.PreviewMacro.Actions}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <GroupBox Header="Macro preview" Grid.Row="2" Grid.Column="0">
+                        <ListBox Margin="3 3 3 3" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedScenario.PreviewMacro.Actions}" SelectedItem="{Binding Path=SelectedScenario.PreviewMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
+                    </GroupBox>
                     <!-- Options Grid-->
-                    <Grid Grid.Row="2" Grid.Column="2" DataContext="{Binding Path=SelectedScenario}">
+                    <GroupBox Margin="3 3 3 3" Header="Properties" Grid.Row="2" Grid.Column="2">
+                        <Grid DataContext="{Binding Path=SelectedScenario}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition/>
@@ -313,7 +355,7 @@
                         <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
 
                     </Grid>
-                    
+                    </GroupBox>
                     <!--Splitters-->
                     <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="5"/>
                     <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5"/>
@@ -347,6 +389,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*" MinHeight="150"/>
                         </Grid.RowDefinitions>
+
                         <!--Templates list-->
                         <GroupBox Header="Templates" Grid.Row="0">
                             <ListBox Margin="0 5 0 0" ItemsSource="{Binding Path=ActionTemplates}" SelectedItem="{Binding Path=SelectedTemplate}">
@@ -359,12 +402,12 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                             <ListBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Delete" Command="{Binding Path=CommandDelTemplate}" CommandParameter="{Binding Path=SelectedTemplate}"/>
-                                    <MenuItem Header="Edit" Command="{Binding Path=CommandStartStopEditTemplate}" CommandParameter="{Binding Path=SelectedTemplate}"/>
-                                    <MenuItem Header="Add New" Command="{Binding Path=CommandAddTemplate}"/>
-                                </ContextMenu>
-                            </ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Add template" Command="{Binding Path=CommandAddItemToList}" CommandParameter="ActionTemplate"/>
+                                        <MenuItem Header="Remove" Command="{Binding Path=CommandRemoveItemFromList}" CommandParameter="{Binding Path=SelectedTemplate}"/>
+                                        <MenuItem Header="Edit" Command="{Binding Path=CommandEditItem}" CommandParameter="{Binding Path=SelectedTemplate}"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
                         </ListBox>
                         </GroupBox>
                         
@@ -393,20 +436,22 @@
                                 </Grid>
                                 
                                 <!--MainView List-->
-                                <ListBox Grid.Row="1" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedMacro.Actions}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <GroupBox Header="Actions" Grid.Row="1">
+                                    <ListBox Margin="3 3 3 3" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedMacro.Actions}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel/>
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                 </ListBox>
+                                </GroupBox>
                             </Grid>
                         </Border>
                     </Grid>
 
                     <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
                     
-                    <!--Macros and Options-->
+                    <!--Macros list and Properties-->
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" MinHeight="100"/>
@@ -424,9 +469,9 @@
                             <ListBox Grid.Row="0" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedMacro}" KeyUp="MacrosListBox_KeyUp">
                                 <ListBox.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Add" Command="{Binding Path=CommandAddMacro}"/>
-                                        <MenuItem Header="Remove" Command="{Binding Path=CommandDelMacro}" CommandParameter="{Binding Path=SelectedMacro}"/>
-                                        <MenuItem Header="Rename" Command="{Binding Path=CommandRenameMacro}"/>
+                                        <MenuItem Header="Add" Command="{Binding Path=CommandAddItemToList}" CommandParameter="Macro"/>
+                                        <MenuItem Header="Remove" Command="{Binding Path=CommandRemoveItemFromList}" CommandParameter="{Binding Path=SelectedMacro}"/>
+                                        <MenuItem Header="Rename" Command="{Binding Path=CommandEditItem}" CommandParameter="{Binding Path=SelectedMacro}"/>
                                     </ContextMenu>
                                 </ListBox.ContextMenu>
                                 <ListBox.Resources>
@@ -442,14 +487,14 @@
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter Property="FontWeight" Value="Bold"/>
                                             </Trigger>
-                                            <DataTrigger Binding="{Binding Path=EditNameMode}" Value="True">
+                                                <DataTrigger Binding="{Binding Path=EditingMode}" Value="True">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource EditTemplate}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </ListBox.Resources>
                             </ListBox>
-                            <Button Margin="0 3 0 0" Grid.Row="1" Content="Add" Command="{Binding Path=CommandAddMacro}"/>
+                            <Button Margin="0 3 0 0" Grid.Row="1" Content="Add" Command="{Binding Path=CommandAddItemToList}" CommandParameter="Macro"/>
                         </Grid>
                         </GroupBox>
                         
@@ -482,11 +527,14 @@
                         </Grid>
                         </GroupBox>
                     </Grid>
+
                 </Grid>
             </TabItem>
         </TabControl>
         <StatusBar Grid.Row="3" Background="LightGray">
-
+            <StatusBarItem>
+                <TextBlock Text="Alpha build"/>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>

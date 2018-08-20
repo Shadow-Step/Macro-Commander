@@ -175,19 +175,36 @@ namespace Macro_Commander.src
         }
         public static void UnregisterKey(HotKey key)
         {
+            int result = 0;
             if (hWnd != null)
             {
                 if (key == null)
                     return;
-                var result = UnregisterHotKey(hWnd, key.Id);
+                try
+                {
+                    result = UnregisterHotKey(hWnd, key.Id);
+                    HotKeys.Remove(key);
+                    HotKey.IdSet.Remove(key.Id);
+                }
+                catch (Exception e)
+                {
+#if DEBUGLOG
+                    Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{{e.Message}}} : Code{{{result}}}");
+#endif
+                }
 #if DEBUGLOG
                 Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
 #endif
-                HotKeys.Remove(key);
-                HotKey.IdSet.Remove(key.Id);
+
             }
             else
+            {
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{hWnd is null}} : Code{{{result}}}");
+#endif
                 throw new Exception("hWnd is null");
+            }
+            
 
         }
         public static void UnregisterAll()

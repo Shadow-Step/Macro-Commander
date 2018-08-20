@@ -16,7 +16,7 @@ namespace Macro_Commander.src
         private Action _selectedaction;
         private bool _startedmutex = false;
         private double _totalExecutionTime;
-        private bool _editNameMode;
+        private bool _editingMode;
         //Properties
         public ObservableCollection<Action> Actions { get; set; }
         public Action SelectedAction
@@ -38,7 +38,7 @@ namespace Macro_Commander.src
                 else
                     _name = value;
                 PropChanged("Name");
-                EditNameMode = false;
+                EditingMode = false;
             }
         }
         public bool StartedMutex
@@ -63,13 +63,13 @@ namespace Macro_Commander.src
             }
 
         }
-        public bool EditNameMode
+        public bool EditingMode
         {
-            get { return _editNameMode; }
+            get { return _editingMode; }
             set
             {
-                _editNameMode = value;
-                PropChanged("EditNameMode");
+                _editingMode = value;
+                PropChanged("EditingMode");
             }
         }
         //Commands
