@@ -240,6 +240,7 @@ namespace Macro_Commander.src
                     return;
                 var index = ActionTemplates.IndexOf(action);
                 ActionTemplates.Remove(action);
+                action.HotKey = null;
                 StartStopEditTemplate(null);
             }
             else
