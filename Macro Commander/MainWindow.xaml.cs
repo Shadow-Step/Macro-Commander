@@ -253,6 +253,12 @@ namespace Macro_Commander
             }
         }
 
+        private void ShowHelpWindow(object sender, RoutedEventArgs e)
+        {
+            win.HelpWindow window = new win.HelpWindow();
+            window.Show();
+        }
+
         private void EditMacroNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
@@ -260,7 +266,6 @@ namespace Macro_Commander
                 ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
             }
         }
-
         private void MacrosListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if(e.Key == Key.Delete)
@@ -269,5 +274,7 @@ namespace Macro_Commander
                     ViewModel.viewModel.CommandDelMacro.Execute(ViewModel.viewModel.SelectedMacro);
             }
         }
+
+        
     }
 }

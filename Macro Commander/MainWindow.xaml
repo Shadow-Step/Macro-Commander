@@ -182,6 +182,7 @@
                 <MenuItem Header="Save" Click="MenuSaveClick"/>
                 <MenuItem Header="Save as" Click="MenuSaveAsClick"/>
             </MenuItem>
+            <MenuItem Header="Help" Click="ShowHelpWindow"/>
         </Menu>
         <ToolBar Grid.Row="1" Background="LightGray">
             
@@ -334,10 +335,10 @@
                                 <RowDefinition.Style>
                                     <Style TargetType="RowDefinition">
                                         <Setter Property="Height" Value="0.15*"/>
-                                        <Setter Property="MinHeight" Value="95"/>
+                                        <Setter Property="MinHeight" Value="110"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Path=SelectedTemplate.EditingMode}" Value="True">
-                                                <Setter Property="MinHeight" Value="150"/>
+                                                <Setter Property="MinHeight" Value="170"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -347,7 +348,8 @@
                             <RowDefinition Height="*" MinHeight="150"/>
                         </Grid.RowDefinitions>
                         <!--Templates list-->
-                        <ListBox Grid.Row="0" ItemsSource="{Binding Path=ActionTemplates}" SelectedItem="{Binding Path=SelectedTemplate}">
+                        <GroupBox Header="Templates" Grid.Row="0">
+                            <ListBox Margin="0 5 0 0" ItemsSource="{Binding Path=ActionTemplates}" SelectedItem="{Binding Path=SelectedTemplate}">
                             <ListBox.ItemContainerStyleSelector>
                                 <local:ActionTemplateStyleSelector TemplateOriginStyle="{StaticResource TemplateOriginStyle}" TemplatePlaceHolderStyle="{StaticResource TemplatePlaceHolderStyle}"/>
                             </ListBox.ItemContainerStyleSelector>
@@ -364,6 +366,7 @@
                                 </ContextMenu>
                             </ListBox.ContextMenu>
                         </ListBox>
+                        </GroupBox>
                         
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                         
@@ -412,7 +415,8 @@
                         </Grid.RowDefinitions>
                         
                         <!--Macros List box-->
-                        <Grid Grid.Row="0">
+                        <GroupBox Header="Macros" Grid.Row="0">
+                            <Grid Margin="0 5 0 0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
@@ -447,11 +451,13 @@
                             </ListBox>
                             <Button Margin="0 3 0 0" Grid.Row="1" Content="Add" Command="{Binding Path=CommandAddMacro}"/>
                         </Grid>
+                        </GroupBox>
                         
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 
                         <!--Options-->
-                        <Grid Grid.Row="2">
+                        <GroupBox Header="Properties" Grid.Row="2">
+                            <Grid Margin="0 5 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
@@ -474,7 +480,7 @@
                             <TextBox Grid.Row="3" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Pause}"/>
                             <TextBox Grid.Row="4" Margin="5 0 0 0" Grid.Column="1" Text="{Binding Path=SelectedMacro.SelectedAction.Times}"/>
                         </Grid>
-                            
+                        </GroupBox>
                     </Grid>
                 </Grid>
             </TabItem>
