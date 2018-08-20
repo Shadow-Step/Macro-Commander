@@ -66,6 +66,8 @@ namespace Macro_Commander.src
             get { return _selectedMacro; }
             set
             {
+                if (_selectedMacro != null && _selectedMacro.EditNameMode)
+                    _selectedMacro.EditNameMode = false;
                 _selectedMacro = value;
                 PropChanged("SelectedMacro");
             }
@@ -120,6 +122,7 @@ namespace Macro_Commander.src
         public RelayCommand CommandStartStopEditTemplate { get; set; }
         public RelayCommand CommandAddTemplate { get; set; }
         public RelayCommand CommandDelTemplate { get; set; }
+        public RelayCommand CommandRenameMacro { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -132,6 +135,7 @@ namespace Macro_Commander.src
             CommandStartStopEditTemplate = new RelayCommand(StartStopEditTemplate);
             CommandAddTemplate = new RelayCommand(AddTemplate);
             CommandDelTemplate = new RelayCommand(DelTemplate);
+            CommandRenameMacro = new RelayCommand(RenameMacro, x => SelectedMacro != null);
             MacroList = new ObservableCollection<Macro>();
             Scenarios = new ObservableCollection<Scenario>();
             ActionTemplates = new ObservableCollection<ActionTemplate>();
@@ -149,6 +153,7 @@ namespace Macro_Commander.src
         {
             MacroList.Add(new Macro());
             SelectedMacro = MacroList.Last();
+            CommandRenameMacro.Execute(null);
         }
         private void DelMacro(object param)
         {
@@ -245,6 +250,10 @@ namespace Macro_Commander.src
             }
             else
                 throw new Exception();
+        }
+        private void RenameMacro(object param)
+        {
+            SelectedMacro.EditNameMode = true;
         }
         private async void ExecuteScenarioAsync(object param)
         {

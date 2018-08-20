@@ -44,6 +44,7 @@ namespace Macro_Commander
             WinWrapper.hWnd = hWnd;
             this.DataContext = ViewModel.viewModel;
         }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             WinWrapper.UnregisterAll();
@@ -74,7 +75,7 @@ namespace Macro_Commander
                                         if(template.HotKey == key)
                                         {
                                             var pos = System.Windows.Forms.Cursor.Position;
-                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 48, pos.X, pos.Y)));
+                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
                                         }
                                     }
                                     break;
@@ -128,40 +129,78 @@ namespace Macro_Commander
 
         private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
+            if (KeyList[1] == Key.None)
                 return;
+            if(!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
+            {
+                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
+                return;
+            }
+
+            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
+            {
+                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
+                return;
+            }
             Keyboard.ClearFocus();
             if (ViewModel.viewModel.SelectedScenario != null)
-                ViewModel.viewModel.SelectedScenario.HotKey = KeyList[1] == Key.None ?
-                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[0].ToString()) :
-                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
+                ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
             KeyList[0] = KeyList[1] = Key.None;
         }
         private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
+            if (KeyList[1] == Key.None)
                 return;
+            if (!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
+            {
+                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
+                return;
+            }
+
+            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
+            {
+                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
+                return;
+            }
             Keyboard.ClearFocus();
             if (ViewModel.viewModel.SelectedTemplate != null)
-                ViewModel.viewModel.SelectedTemplate.HotKey = KeyList[1] == Key.None ? 
-                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[0].ToString()) : 
-                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
+                ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
             KeyList[0] = KeyList[1] = Key.None;
         }
 
         private void ActionTemplateHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (KeyList[0] == Key.None)
-                KeyList[0] = e.Key;
-            else
-                KeyList[1] = e.Key;
+            switch (e.Key)
+            {
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                case Key.LeftShift:
+                case Key.RightShift:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    KeyList[0] = e.Key;
+                    break;
+                default:
+                    KeyList[1] = e.Key;
+                    break;
+            }
         }
         private void ScenarioHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (KeyList[0] == Key.None)
-                KeyList[0] = e.Key;
-            else
-                KeyList[1] = e.Key;
+            switch (e.Key)
+            {
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                case Key.LeftShift:
+                case Key.RightShift:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    KeyList[0] = e.Key;
+                    break;
+                default:
+                    KeyList[1] = e.Key;
+                    break;
+            }
         }
         private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
         {
@@ -211,6 +250,23 @@ namespace Macro_Commander
             if (saveFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 ViewModel.viewModel.CommandSaveToFile.Execute(saveFile.FileName);
+            }
+        }
+
+        private void EditMacroNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
+            }
+        }
+
+        private void MacrosListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Delete)
+            {
+                if (ViewModel.viewModel.SelectedMacro != null)
+                    ViewModel.viewModel.CommandDelMacro.Execute(ViewModel.viewModel.SelectedMacro);
             }
         }
     }

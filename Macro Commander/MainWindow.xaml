@@ -23,9 +23,10 @@
                     </Border>
                     <Separator/>
                     <StackPanel Orientation="Vertical" Margin="2 0 2 0">
-                        <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=X: {0}, Path=X}"/>
-                        <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
-                        <TextBlock FontWeight="Bold" Foreground="Black" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=X: {0}, Path=X}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=C: {0}, Path=Times}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -41,6 +42,7 @@
                         <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=X: {0}, Path=X}"/>
                         <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
                         <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                        <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=C: {0}, Path=Times}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -415,26 +417,37 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ListBox Grid.Row="0" DisplayMemberPath="Name" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedMacro}">
+                            <ListBox Grid.Row="0" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedMacro}" KeyUp="MacrosListBox_KeyUp">
                                 <ListBox.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Add" Command="{Binding Path=CommandAddMacro}"/>
                                         <MenuItem Header="Remove" Command="{Binding Path=CommandDelMacro}" CommandParameter="{Binding Path=SelectedMacro}"/>
-                                        <MenuItem Header="Rename"/>
+                                        <MenuItem Header="Rename" Command="{Binding Path=CommandRenameMacro}"/>
                                     </ContextMenu>
                                 </ListBox.ContextMenu>
                                 <ListBox.Resources>
+                                    <DataTemplate x:Key="OriginTemplate">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                    <DataTemplate x:Key="EditTemplate">
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}" KeyUp="EditMacroNameTextBox_KeyUp"/>
+                                    </DataTemplate>
                                     <Style TargetType="ListBoxItem">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource OriginTemplate}"/>
                                         <Style.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter Property="FontWeight" Value="Bold"/>
                                             </Trigger>
+                                            <DataTrigger Binding="{Binding Path=EditNameMode}" Value="True">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource EditTemplate}"/>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </ListBox.Resources>
                             </ListBox>
                             <Button Margin="0 3 0 0" Grid.Row="1" Content="Add" Command="{Binding Path=CommandAddMacro}"/>
                         </Grid>
+                        
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 
                         <!--Options-->
