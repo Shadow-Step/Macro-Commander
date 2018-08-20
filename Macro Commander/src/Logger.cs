@@ -27,5 +27,9 @@ namespace Macro_Commander.src
                 stream.WriteLine($"\t {System.DateTime.Now.ToLongTimeString()} - {message}");
             }
         }
+        public void CatchException(string className,string method,string exMessage)
+        {
+            WriteToLog($"{className} : {method} : Exception{{{exMessage}}}");
+        }
     }
 }

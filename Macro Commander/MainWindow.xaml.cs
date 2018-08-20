@@ -35,47 +35,44 @@ namespace Macro_Commander
         //Window
         public MainWindow()
         {
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start InitializeComponent");
-#endif
-            InitializeComponent();
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("End InitializeComponent");
-#endif
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Constructor", e.Message);
+                throw;
+            }
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start Window_Loaded");
-#endif
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start hWndInit");
-#endif
-            hWnd = new WindowInteropHelper(this).Handle;
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start getting Source");
-#endif
-            source = HwndSource.FromHwnd(hWnd);
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start Hook Adding");
-#endif
-            source.AddHook(MsgListener);
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start hWnd attach");
-#endif
-            WinWrapper.hWnd = hWnd;
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Start DataContext attach");
-#endif
-            this.DataContext = ViewModel.viewModel;
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("End Window_Loaded");
-#endif
+            try
+            {
+                hWnd = new WindowInteropHelper(this).Handle;
+                source = HwndSource.FromHwnd(hWnd);
+                source.AddHook(MsgListener);
+                WinWrapper.hWnd = hWnd;
+                this.DataContext = ViewModel.viewModel;
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Window_Loaded", ex.Message);
+                throw;
+            }
         }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            WinWrapper.UnregisterAll();
+            try
+            {
+                WinWrapper.UnregisterAll();
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Window_Closing",ex.Message);
+                throw;
+            }
+            
         }
 
         //Methods
@@ -83,6 +80,8 @@ namespace Macro_Commander
         //Global message listener
         private IntPtr MsgListener(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+            try
+            {
             const int WM_HOTKEY = 0x0312;
             switch (msg)
             {
@@ -142,7 +141,12 @@ namespace Macro_Commander
                 default:
                     break;
             }
-
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "MsgListener", ex.Message);
+                throw;
+            }
             return IntPtr.Zero;
         }
         

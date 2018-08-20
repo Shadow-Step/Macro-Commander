@@ -20,18 +20,13 @@ namespace Macro_Commander.src
         {
             get
             {
-#if DEBUGLOG
-                Logger.GetLogger().WriteToLog("Get");
-#endif
                 try
                 {
                     return _viewmodel ?? (_viewmodel = new ViewModel());
                 }
                 catch (Exception e)
                 {
-#if DEBUGLOG
-                    Logger.GetLogger().WriteToLog($"{e.Message}");
-#endif
+                    Logger.GetLogger().CatchException("ViewModel","Property viewModel",e.Message);
                     throw;
                 }
                 
@@ -138,33 +133,30 @@ namespace Macro_Commander.src
         //Constructor
         private ViewModel()
         {
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("ViewModel constructor started");
-#endif
-            CommandSaveToFile = new RelayCommand(SaveToFile);
-            CommandLoadFromFile = new RelayCommand(LoadFromFile);
-            CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
-            CommandEditItem = new RelayCommand(EditItem, x => x != null);
-            CommandAddItemToList = new RelayCommand(AddItemToList);
-            CommandRemoveItemFromList = new RelayCommand(RemoveItemFromList, x => x != null);
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Commands Init ended");
-#endif
-            MacroList = new ObservableCollection<Macro>();
-            Scenarios = new ObservableCollection<Scenario>();
-            ActionTemplates = new ObservableCollection<ActionTemplate>();
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("Collections init ended");
-#endif
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.MouseLeftButtonClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.MouseRightButtonClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.MouseLeftButtonClick, 2));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.MouseMove, 0));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.MouseMove, 0));
-            ActionTemplates.Last().PlaceHolder = true;
-#if DEBUGLOG
-            Logger.GetLogger().WriteToLog("ViewModel constructor ended");
-#endif
+            try
+            {
+                CommandSaveToFile = new RelayCommand(SaveToFile);
+                CommandLoadFromFile = new RelayCommand(LoadFromFile);
+                CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync, (param) => SelectedScenario != null);
+                CommandEditItem = new RelayCommand(EditItem, x => x != null);
+                CommandAddItemToList = new RelayCommand(AddItemToList);
+                CommandRemoveItemFromList = new RelayCommand(RemoveItemFromList, x => x != null);
+                MacroList = new ObservableCollection<Macro>();
+                Scenarios = new ObservableCollection<Scenario>();
+                ActionTemplates = new ObservableCollection<ActionTemplate>();
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.MouseLeftButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.MouseRightButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.MouseLeftButtonClick, 2));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.MouseMove, 0));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.MouseMove, 0));
+                ActionTemplates.Last().PlaceHolder = true;
+            }
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("ViewModel", "Constructor", e.Message);
+                throw;
+            }
+            
         }
         //Methods
 

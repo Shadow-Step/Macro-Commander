@@ -163,9 +163,7 @@ namespace Macro_Commander.src
             }
             catch (Exception e)
             {
-#if DEBUGLOG
-                Logger.GetLogger().WriteToLog($"WinWrapper: RegisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{{e.Message}}} : Code{{{0}}}");
-#endif
+                Logger.GetLogger().CatchException("WinWrapper", "RegisterHotKey", e.Message);
                 throw;
             }
 #if DEBUGLOG
@@ -188,9 +186,8 @@ namespace Macro_Commander.src
                 }
                 catch (Exception e)
                 {
-#if DEBUGLOG
-                    Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{{e.Message}}} : Code{{{result}}}");
-#endif
+                    Logger.GetLogger().CatchException("WinWrapper", "RegisterHotKey", e.Message);
+                    throw;
                 }
 #if DEBUGLOG
                 Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
@@ -199,9 +196,7 @@ namespace Macro_Commander.src
             }
             else
             {
-#if DEBUGLOG
-                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{hWnd is null}} : Code{{{result}}}");
-#endif
+                Logger.GetLogger().CatchException("WinWrapper", "UnRegisterHotKey", "hWnd is null");
                 throw new Exception("hWnd is null");
             }
             
@@ -210,8 +205,10 @@ namespace Macro_Commander.src
         public static void UnregisterAll()
         {
             if (hWnd == null)
+            {
+                Logger.GetLogger().CatchException("WinWrapper", "UnregisterAll", "hWnd is null");
                 throw new Exception();
-
+            }
             foreach (var key in HotKeys)
             {
                 var result = UnregisterHotKey(hWnd, key.Id);
