@@ -73,6 +73,7 @@
     <Compile Include="src\Config.cs" />
     <Compile Include="src\HotKey.cs" />
     <Compile Include="src\INotifyWrapper.cs" />
+    <Compile Include="src\Logger.cs" />
     <Compile Include="src\Macro.cs" />
     <Compile Include="src\RelayCommand.cs" />
     <Compile Include="src\Scenario.cs" />

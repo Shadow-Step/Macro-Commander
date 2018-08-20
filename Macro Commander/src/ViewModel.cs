@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUGLOG
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -176,42 +177,67 @@ namespace Macro_Commander.src
         private void SaveToFile(object param)
         {
             var path = param as string;
-            ProjectPath = path ?? throw new Exception();
-
-            StartStopEditTemplate(null);
-            ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+            try
             {
-                formatter.Serialize(stream, args);
+                ProjectPath = path ?? throw new Exception();
+
+                StartStopEditTemplate(null);
+                ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(stream, args);
+                }
             }
+            catch (Exception e)
+            {
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"ViewModel: SaveToFile: Path{{{path}}}, Exception{{{e.Message}}} : Code{{{0}}}");
+#endif
+                throw;
+            }
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"ViewModel: SaveToFile: Path{{{path}}} : Code{{{1}}}");
+#endif
         }
         private void LoadFromFile(object param)
         {
             var path = param as string;
-            ProjectPath = path ?? throw new Exception();
-
-            StartStopEditTemplate(null);
-            BinaryFormatter formatter = new BinaryFormatter();
-            WinWrapper.UnregisterAll();
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+            try
             {
-                ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
-                MacroList = args.MacroList;
-                Scenarios = args.Scenarios;
-                foreach (var action in Scenarios)
+                ProjectPath = path ?? throw new Exception();
+
+                StartStopEditTemplate(null);
+                BinaryFormatter formatter = new BinaryFormatter();
+                WinWrapper.UnregisterAll();
+                using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
                 {
-                    WinWrapper.RegisterKey(action.HotKey);
+                    ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
+                    MacroList = args.MacroList;
+                    Scenarios = args.Scenarios;
+                    foreach (var action in Scenarios)
+                    {
+                        WinWrapper.RegisterKey(action.HotKey);
+                    }
+                    ActionTemplates = args.ActionTemplates;
+                    foreach (var action in ActionTemplates)
+                    {
+                        WinWrapper.RegisterKey(action.HotKey);
+                    }
+                    SelectedMacro = args.SelectedMacro;
+                    SelectedScenario = args.SelectedScenario;
                 }
-                ActionTemplates = args.ActionTemplates;
-                foreach (var action in ActionTemplates)
-                {
-                    WinWrapper.RegisterKey(action.HotKey);
-                }
-                SelectedMacro = args.SelectedMacro;
-                SelectedScenario = args.SelectedScenario;
             }
-            
+            catch (Exception e)
+            {
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"ViewModel: LoadFromFile: Path{{{path}}}, Exception{{{e.Message}}} : Code{{{0}}}");
+#endif
+                throw;
+            }
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"ViewModel: LoadFromFile: Path{{{path}}} : Code{{{1}}}");
+#endif
         }
         private void AddScenario(object param)
         {

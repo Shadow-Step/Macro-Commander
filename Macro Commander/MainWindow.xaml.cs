@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUGLOG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,6 +62,10 @@ namespace Macro_Commander
                 case WM_HOTKEY:
                     var l = lParam.ToInt32();
                     var w = wParam.ToInt32();
+#if DEBUGLOG
+                    short code = 0;
+                    string command = "null";
+#endif
                     foreach (var key in WinWrapper.HotKeys)
                     {
                         int shortcode = WinWrapper.KeyDict[key.Key]; 
@@ -76,6 +81,10 @@ namespace Macro_Commander
                                         {
                                             var pos = System.Windows.Forms.Cursor.Position;
                                             ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
+#if DEBUGLOG
+                                            command = "CommandAddAction";
+                                            code = 1;
+#endif
                                         }
                                     }
                                     break;
@@ -86,14 +95,22 @@ namespace Macro_Commander
                                         {
                                             ViewModel.viewModel.SelectedScenario = scen;
                                             ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
+#if DEBUGLOG
+                                            command = "CommandExecuteScenarioAsync";
+                                            code = 1;
+#endif
                                         }
                                     }
                                     break;
                                 default:
                                     break;
                             }
+
                         }
                     }
+#if DEBUGLOG
+                    Logger.GetLogger().WriteToLog($"MsgListener: MessageReceived: Msg{{{WM_HOTKEY}}}, l{{{l}}}, w{{{w}}} : Command{{{command}}}, Code{{{code}}}");
+#endif
                     break;
                 default:
                     break;

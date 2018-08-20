@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUGLOG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -147,14 +149,28 @@ namespace Macro_Commander.src
 
         public static void RegisterKey(HotKey key)
         {
-            if (key == null || key.Key == null)
-                return;
-            var exist = from k in HotKeys where k.Key == key.Key select k;
-            if(exist.Count() > 0)
+            int result = 0;
+            try
             {
-                UnregisterKey(exist.First());
+                if (key == null || key.Key == null)
+                    return;
+                var exist = from k in HotKeys where k.Key == key.Key select k;
+                if (exist.Count() > 0)
+                {
+                    UnregisterKey(exist.First());
+                }
+                result = RegisterHotKey(hWnd, key.Id, key.StringModifier == null ? 0 : (uint)KeyDict[key.StringModifier], KeyDict[key.Key]);
             }
-            var result = RegisterHotKey(hWnd, key.Id, key.StringModifier == null ? 0 : (uint)KeyDict[key.StringModifier] , KeyDict[key.Key]);
+            catch (Exception e)
+            {
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: RegisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}}, Exception{{{e.Message}}} : Code{{{0}}}");
+#endif
+                throw;
+            }
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"WinWrapper: RegisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
             HotKeys.Add(key);
         }
         public static void UnregisterKey(HotKey key)
@@ -163,7 +179,10 @@ namespace Macro_Commander.src
             {
                 if (key == null)
                     return;
-                var x = UnregisterHotKey(hWnd, key.Id);
+                var result = UnregisterHotKey(hWnd, key.Id);
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
                 HotKeys.Remove(key);
                 HotKey.IdSet.Remove(key.Id);
             }
@@ -175,9 +194,13 @@ namespace Macro_Commander.src
         {
             if (hWnd == null)
                 throw new Exception();
-            foreach (var item in HotKeys)
+
+            foreach (var key in HotKeys)
             {
-                UnregisterHotKey(hWnd, item.Id);
+                var result = UnregisterHotKey(hWnd, key.Id);
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterAll : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
             }
             HotKeys.Clear();
         }
