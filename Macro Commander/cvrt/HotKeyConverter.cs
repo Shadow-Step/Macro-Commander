@@ -13,7 +13,7 @@ namespace Macro_Commander
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var key = value as src.HotKey;
-            return key == null ? null : key.Key;
+            return key == null ? null : (key.StringModifier == null ? key.Key : $"{key.StringModifier}+{key.Key}");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

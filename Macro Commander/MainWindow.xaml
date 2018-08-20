@@ -306,7 +306,7 @@
                         <ComboBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=ExecutionMode}"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=DelayTime}"/>
                         <TextBox Grid.Row="2" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=LoopTime}"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}" KeyUp="ScenarioHotKeyInit" />
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}" KeyDown="ScenarioHotKeyDown" KeyUp="ScenarioHotKeyInit" />
                         <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
 
                     </Grid>
@@ -415,11 +415,24 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <DataGrid Grid.Row="0" RowStyle="{StaticResource DataGridSelectedRowStyle}" HeadersVisibility="None" ItemsSource="{Binding Path=MacroList}" GridLinesVisibility="None" SelectedItem="{Binding Path=SelectedMacro}" AutoGenerateColumns="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <ListBox Grid.Row="0" DisplayMemberPath="Name" ItemsSource="{Binding Path=MacroList}" SelectedItem="{Binding Path=SelectedMacro}">
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Add" Command="{Binding Path=CommandAddMacro}"/>
+                                        <MenuItem Header="Remove" Command="{Binding Path=CommandDelMacro}" CommandParameter="{Binding Path=SelectedMacro}"/>
+                                        <MenuItem Header="Rename"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.Resources>
+                                    <Style TargetType="ListBoxItem">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.Resources>
+                            </ListBox>
                             <Button Margin="0 3 0 0" Grid.Row="1" Content="Add" Command="{Binding Path=CommandAddMacro}"/>
                         </Grid>
                         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Macro_Commander.enu;
 
 namespace Macro_Commander.src
@@ -17,9 +18,28 @@ namespace Macro_Commander.src
         //Properties
         public enu.HotKeyStatus KeyStatus { get; set; }
         public string Key { get; set; }
-        public string Modifier { get; set; }
+        public Key Modifier { get; set; }
         public int Id { get; set; }
-
+        public string StringModifier
+        {
+            get
+            {
+                switch(Modifier)
+                {
+                    case System.Windows.Input.Key.LeftAlt:
+                    case System.Windows.Input.Key.RightAlt:
+                        return "ALT";
+                    case System.Windows.Input.Key.LeftCtrl:
+                    case System.Windows.Input.Key.RightCtrl:
+                        return "CTRL";
+                    case System.Windows.Input.Key.LeftShift:
+                    case System.Windows.Input.Key.RightShift:
+                        return "SHIFT";
+                    default:
+                        return null;
+                }
+            }
+        }
         //Constructor
         private HotKey()
         {
@@ -27,7 +47,7 @@ namespace Macro_Commander.src
         }
 
         //Methods
-        public static HotKey CreateHotKey(enu.HotKeyStatus status,string key,string modifier = null)
+        public static HotKey CreateHotKey(enu.HotKeyStatus status,string key, System.Windows.Input.Key modifier = System.Windows.Input.Key.None)
         {
             HotKey temp = new HotKey();
             temp.KeyStatus = status;

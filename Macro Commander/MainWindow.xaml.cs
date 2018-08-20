@@ -62,8 +62,8 @@ namespace Macro_Commander
                     var w = wParam.ToInt32();
                     foreach (var key in WinWrapper.HotKeys)
                     {
-                        int shortcode = WinWrapper.KeyDict[key.Key];
-                        int longcode = WinWrapper.VirtualKeyCodes[shortcode];
+                        int shortcode = WinWrapper.KeyDict[key.Key]; 
+                        int longcode = WinWrapper.VirtualKeyCodes[shortcode] + (key.StringModifier == null ? 0 : WinWrapper.KeyDict[key.StringModifier]);
                         if(l == shortcode || w == shortcode || l == longcode || w == longcode)
                         {
                             switch (key.KeyStatus)
@@ -128,19 +128,35 @@ namespace Macro_Commander
 
         private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
+                return;
             Keyboard.ClearFocus();
-            if(ViewModel.viewModel.SelectedScenario != null)
-            ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, e.Key.ToString());
+            if (ViewModel.viewModel.SelectedScenario != null)
+                ViewModel.viewModel.SelectedScenario.HotKey = KeyList[1] == Key.None ?
+                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[0].ToString()) :
+                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
+            KeyList[0] = KeyList[1] = Key.None;
         }
         private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
+                return;
             Keyboard.ClearFocus();
             if (ViewModel.viewModel.SelectedTemplate != null)
                 ViewModel.viewModel.SelectedTemplate.HotKey = KeyList[1] == Key.None ? 
                     HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[0].ToString()) : 
-                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0].ToString());
+                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
+            KeyList[0] = KeyList[1] = Key.None;
         }
+
         private void ActionTemplateHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (KeyList[0] == Key.None)
+                KeyList[0] = e.Key;
+            else
+                KeyList[1] = e.Key;
+        }
+        private void ScenarioHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (KeyList[0] == Key.None)
                 KeyList[0] = e.Key;

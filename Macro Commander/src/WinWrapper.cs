@@ -54,6 +54,9 @@ namespace Macro_Commander.src
             {"F9", 0x0078},
             {"F10", 0x0079},
             {"F11", 0x007A},
+            {"ALT", 0x0001 },
+            {"CTRL", 0x0002 },
+            {"SHIFT", 0x0004 },
         };
         public static Dictionary<int, int> VirtualKeyCodes { get; set; } = new Dictionary<int, int>()
         {
@@ -139,7 +142,7 @@ namespace Macro_Commander.src
             {
                 UnregisterKey(exist.First());
             }
-            var result = RegisterHotKey(hWnd, key.Id, 0, KeyDict[key.Key]);
+            var result = RegisterHotKey(hWnd, key.Id, key.StringModifier == null ? 0 : (uint)KeyDict[key.StringModifier] , KeyDict[key.Key]);
             HotKeys.Add(key);
         }
         public static void UnregisterKey(HotKey key)
