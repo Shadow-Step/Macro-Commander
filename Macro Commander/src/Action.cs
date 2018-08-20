@@ -110,15 +110,16 @@ namespace Macro_Commander.src
         {
             switch (ActionType)
             {
-                case ActionType.LeftClick:
+                case ActionType.MouseLeftButtonClick:
                     for (int i = 0; i < Times; i++)
-                        WinWrapper.Click(X, Y);
+                        WinWrapper.MouseLeftButtonClick(X, Y);
                     break;
-                case ActionType.RightClick:
-                    WinWrapper.Click(X, Y);
-                    WinWrapper.Click(X, Y);
+                case ActionType.MouseRightButtonClick:
+                    for (int i = 0; i < Times; i++)
+                        WinWrapper.MouseRightButtonClick(X, Y);
                     break;
-                case ActionType.Pause:
+                case ActionType.MouseMove:
+                    WinWrapper.MouseMove(X,Y);
                     break;
                 default:
                     break;

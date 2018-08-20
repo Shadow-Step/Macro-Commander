@@ -101,11 +101,12 @@ namespace Macro_Commander.src
         };
 
         private const double ABSOLUTE = 65535;
-        private static UInt32 ABSOLUTE_FLAG = 0x8000;
-        private static UInt32 MOUSE_MOVE = 0x0001;
-        private static UInt32 MOUSE_BUTTONDOWN = 0x0002;
-        private static UInt32 MOUSE_BUTTONUP = 0x0004;
-        private static UInt32 WHEEL_ROTATE = 0x0800;
+        private static UInt32 MOUSEEVENTF_ABSOLUTE = 0x8000;
+        private static UInt32 MOUSEEVENTF_MOVE = 0x0001;
+        private static UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
+        private static UInt32 MOUSEEVENTF_LEFTUP = 0x0004;
+        private static UInt32 MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        private static UInt32 MOUSEEVENTF_RIGHTUP = 0x0010;
 
         private const double SCREEN_WIDTH = 1360;
         private const double SCREEN_HEIGHT = 768;
@@ -125,12 +126,23 @@ namespace Macro_Commander.src
         public static extern bool GetCursorPos(ref Point point);
 
 
-        public static void Click(uint x, uint y)
+        public static void MouseLeftButtonClick(uint x, uint y)
         {
-            mouse_event(ABSOLUTE_FLAG | MOUSE_MOVE, (uint)(x  * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
-            mouse_event(MOUSE_BUTTONDOWN, 0, 0, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x  * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, IntPtr.Zero);
             Thread.Sleep(CLICK_SENSITIVITY);
-            mouse_event(MOUSE_BUTTONUP, 0, 0, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, IntPtr.Zero);
+        }
+        public static void MouseRightButtonClick(uint x, uint y)
+        {
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, IntPtr.Zero);
+            Thread.Sleep(CLICK_SENSITIVITY);
+            mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, IntPtr.Zero);
+        }
+        public static void MouseMove(uint x,uint y)
+        {
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
         }
 
         public static void RegisterKey(HotKey key)
