@@ -141,6 +141,14 @@
             <EventSetter Event="MouseDoubleClick" Handler="TemplateItem_MouseDoubleClick"/>
         </Style>
 
+        <Style x:Key="DataGridSelectedRowStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
             <Border Name="Brd" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" BorderThickness="1">
                 <ContentPresenter RecognizesAccessKey="True"  Margin="{TemplateBinding Padding}"></ContentPresenter>
@@ -204,15 +212,28 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <!--Menu-->
-                            <Menu Grid.Row="0" Grid.ColumnSpan="3" Background="LightGray">
-                                <Button Content="&#9650;" Width="20" Command="{Binding Path=SelectedScenario.CommandMoveMacroUp}" CommandParameter="{Binding Path=SelectedScenario.SelectedIndex}"/>
-                                <Button Content="&#9660;" Width="20" Command="{Binding Path=SelectedScenario.CommandMoveMacroDown}" CommandParameter="{Binding Path=SelectedScenario.SelectedIndex}"/>
-                            </Menu>
+                            <Grid Grid.Row="0" Grid.ColumnSpan="3" Background="LightGray">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Menu Grid.Column="0" Background="Transparent">
+                                    <Button Content="&#9650;" Width="20" Command="{Binding Path=SelectedScenario.CommandMoveMacroUp}" CommandParameter="{Binding Path=SelectedScenario.SelectedIndex}"/>
+                                    <Button Content="&#9660;" Width="20" Command="{Binding Path=SelectedScenario.CommandMoveMacroDown}" CommandParameter="{Binding Path=SelectedScenario.SelectedIndex}"/>
+                                </Menu>
+                                <TextBlock Grid.Column="1" Text="{Binding Path=SelectedScenario.Name}" FontSize="18"/>
+                            </Grid>
                             <!--Scenario macros-->
                             <DataGrid Grid.Column="0" SelectionMode="Single" Grid.Row="1" CanUserSortColumns="False" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=SelectedScenario.MacroList}" SelectedIndex="{Binding Path=SelectedScenario.SelectedIndex}">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridRow">
                                         <EventSetter Event="MouseDoubleClick" Handler="ScenarioMacros_MouseDoubleClick"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </Trigger>
+                                        </Style.Triggers>
                                     </Style>
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
@@ -227,6 +248,11 @@
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridRow">
                                         <EventSetter Event="MouseDoubleClick" Handler="AvailableMacros_MouseDoubleClick"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </Trigger>
+                                        </Style.Triggers>
                                     </Style>
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
@@ -243,7 +269,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <DataGrid AutoGenerateColumns="False" Grid.Row="0" HeadersVisibility="None" ItemsSource="{Binding Path=Scenarios}" SelectedItem="{Binding Path=SelectedScenario}">
+                        <DataGrid RowStyle="{StaticResource DataGridSelectedRowStyle}" AutoGenerateColumns="False" Grid.Row="0" HeadersVisibility="None" ItemsSource="{Binding Path=Scenarios}" SelectedItem="{Binding Path=SelectedScenario}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
                             </DataGrid.Columns>
@@ -346,6 +372,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
+                                <!-- Menu Bar -->
                                 <Grid Grid.Row="0" Background="LightGray">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -388,7 +415,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <DataGrid Grid.Row="0" HeadersVisibility="None" ItemsSource="{Binding Path=MacroList}" GridLinesVisibility="None" SelectedItem="{Binding Path=SelectedMacro}" AutoGenerateColumns="False">
+                            <DataGrid Grid.Row="0" RowStyle="{StaticResource DataGridSelectedRowStyle}" HeadersVisibility="None" ItemsSource="{Binding Path=MacroList}" GridLinesVisibility="None" SelectedItem="{Binding Path=SelectedMacro}" AutoGenerateColumns="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Width="*" Binding="{Binding Path=Name}"/>
                                 </DataGrid.Columns>
