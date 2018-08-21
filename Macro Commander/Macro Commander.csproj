@@ -57,12 +57,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="cvrt\ActionTemplateNullConverter.cs" />
     <Compile Include="cvrt\ActionTemplateStyleSelector.cs" />
     <Compile Include="cvrt\ActionTypeConverter.cs" />
     <Compile Include="cvrt\BitmapSourceConverter.cs" />
     <Compile Include="cvrt\ColorConverter.cs" />
     <Compile Include="cvrt\HotKeyConverter.cs" />
+    <Compile Include="cvrt\ValueNullConverter.cs" />
+    <Compile Include="cvrt\VisibilityNullConverter.cs" />
     <Compile Include="enu\ActionType.cs" />
     <Compile Include="enu\CaptureMode.cs" />
     <Compile Include="enu\ExecutionMode.cs" />
