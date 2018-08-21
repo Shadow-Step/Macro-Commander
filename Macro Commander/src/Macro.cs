@@ -16,7 +16,7 @@ namespace Macro_Commander.src
         private Action _selectedaction;
         private bool _startedmutex = false;
         private double _totalExecutionTime;
-
+        private bool _editingMode;
         //Properties
         public ObservableCollection<Action> Actions { get; set; }
         public Action SelectedAction
@@ -33,8 +33,12 @@ namespace Macro_Commander.src
             get { return _name; }
             set
             {
-                _name = value;
+                if (value == string.Empty)
+                    _name = "None";
+                else
+                    _name = value;
                 PropChanged("Name");
+                EditingMode = false;
             }
         }
         public bool StartedMutex
@@ -59,14 +63,21 @@ namespace Macro_Commander.src
             }
 
         }
-
+        public bool EditingMode
+        {
+            get { return _editingMode; }
+            set
+            {
+                _editingMode = value;
+                PropChanged("EditingMode");
+            }
+        }
         //Commands
         public RelayCommand CommandAddAction { get; set; }       
         public RelayCommand CommandDelAction { get; set; }
         public RelayCommand CommandExecute { get; set; }
         public RelayCommand CommandMoveForward { get; set; }
         public RelayCommand CommandMoveBackwards { get; set; }
-
         //Constructor
         public Macro()
         {
@@ -77,7 +88,7 @@ namespace Macro_Commander.src
             CommandMoveBackwards = new RelayCommand(MoveActionBackwards);
             Actions = new ObservableCollection<Action>();
             Actions.CollectionChanged += Actions_CollectionChanged;
-            Name = DateTime.Now.Millisecond.ToString(); //!!!
+            Name = "New Macro";
         }
 
         //Methods
@@ -164,7 +175,6 @@ namespace Macro_Commander.src
                 }
             }
         }
-
         //TEMP!!!
         private void Actions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {

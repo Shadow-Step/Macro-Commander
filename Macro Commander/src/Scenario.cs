@@ -21,6 +21,7 @@ namespace Macro_Commander.src
         private double _delayTime;
         private double _loopTime;
         private HotKey _hotKey;
+        private bool _editingMode;
         //Properties
         public ObservableCollection<Macro> MacroList { get; set; }
         public Macro SelectedMacro
@@ -87,8 +88,12 @@ namespace Macro_Commander.src
             get { return _name; }
             set
             {
-                _name = value;
+                if (value == string.Empty)
+                    _name = "None";
+                else
+                    _name = value;
                 PropChanged("Name");
+                EditingMode = false;
             }
         }
         public double LoopTime
@@ -105,9 +110,19 @@ namespace Macro_Commander.src
             get { return _hotKey; }
             set
             {
+                if(_hotKey != null)
                 WinWrapper.UnregisterKey(_hotKey);
                 _hotKey = value;
                 PropChanged("HotKey");
+            }
+        }
+        public bool EditingMode
+        {
+            get { return _editingMode; }
+            set
+            {
+                _editingMode = value;
+                PropChanged("EditingMode");
             }
         }
         //Commands

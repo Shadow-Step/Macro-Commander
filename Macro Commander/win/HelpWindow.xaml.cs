@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Macro_Commander.win
 {
     /// <summary>
-    /// Логика взаимодействия для Window1.xaml
+    /// Логика взаимодействия для HelpWindow.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class HelpWindow : Window
     {
-        public Window1()
+        public HelpWindow()
         {
             InitializeComponent();
         }

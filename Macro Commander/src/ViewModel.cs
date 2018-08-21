@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUGLOG
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -19,7 +20,16 @@ namespace Macro_Commander.src
         {
             get
             {
-                return _viewmodel ?? (_viewmodel = new ViewModel());
+                try
+                {
+                    return _viewmodel ?? (_viewmodel = new ViewModel());
+                }
+                catch (Exception e)
+                {
+                    Logger.GetLogger().CatchException("ViewModel","Property viewModel",e.Message);
+                    throw;
+                }
+                
             }
         }
         //Fields
@@ -66,6 +76,8 @@ namespace Macro_Commander.src
             get { return _selectedMacro; }
             set
             {
+                if (_selectedMacro != null && _selectedMacro.EditingMode)
+                    _selectedMacro.EditingMode = false;
                 _selectedMacro = value;
                 PropChanged("SelectedMacro");
             }
@@ -75,6 +87,8 @@ namespace Macro_Commander.src
             get { return _selectedScenario; }
             set
             {
+                if (_selectedScenario != null && _selectedScenario.EditingMode)
+                    _selectedScenario.EditingMode = false;
                 _selectedScenario = value;
                 PropChanged("SelectedScenario");
             }
@@ -110,49 +124,84 @@ namespace Macro_Commander.src
         }
         
         //Commands
-        public RelayCommand CommandAddMacro { get; set; }
-        public RelayCommand CommandDelMacro { get; set; }
         public RelayCommand CommandSaveToFile { get; set; }
         public RelayCommand CommandLoadFromFile { get; set; }
-        public RelayCommand CommandAddScenario { get; set; }
-        public RelayCommand CommandDelScenario { get; set; }
         public RelayCommand CommandExecuteScenarioAsync { get; set; }
-        public RelayCommand CommandStartStopEditTemplate { get; set; }
-        public RelayCommand CommandAddTemplate { get; set; }
-        public RelayCommand CommandDelTemplate { get; set; }
+        public RelayCommand CommandEditItem { get; set; }
+        public RelayCommand CommandAddItemToList { get; set; }
+        public RelayCommand CommandRemoveItemFromList { get; set; }
         //Constructor
         private ViewModel()
         {
-            CommandAddMacro = new RelayCommand(AddMacro);
-            CommandDelMacro = new RelayCommand(DelMacro, x => MacroList.Count > 0);
-            CommandSaveToFile = new RelayCommand(SaveToFile);
-            CommandLoadFromFile = new RelayCommand(LoadFromFile);
-            CommandAddScenario = new RelayCommand(AddScenario);
-            CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync,(param)=>SelectedScenario!=null);
-            CommandStartStopEditTemplate = new RelayCommand(StartStopEditTemplate);
-            CommandAddTemplate = new RelayCommand(AddTemplate);
-            CommandDelTemplate = new RelayCommand(DelTemplate);
-            MacroList = new ObservableCollection<Macro>();
-            Scenarios = new ObservableCollection<Scenario>();
-            ActionTemplates = new ObservableCollection<ActionTemplate>();
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.LeftClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.RightClick, 1));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.LeftClick, 2));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.Pause, 0));
-            ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.Pause, 0));
-            ActionTemplates.Last().PlaceHolder = true;
+            try
+            {
+                CommandSaveToFile = new RelayCommand(SaveToFile);
+                CommandLoadFromFile = new RelayCommand(LoadFromFile);
+                CommandExecuteScenarioAsync = new RelayCommand(ExecuteScenarioAsync, (param) => SelectedScenario != null);
+                CommandEditItem = new RelayCommand(EditItem, x => x != null);
+                CommandAddItemToList = new RelayCommand(AddItemToList);
+                CommandRemoveItemFromList = new RelayCommand(RemoveItemFromList, x => x != null);
+                MacroList = new ObservableCollection<Macro>();
+                Scenarios = new ObservableCollection<Scenario>();
+                ActionTemplates = new ObservableCollection<ActionTemplate>();
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.MouseLeftButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.MouseRightButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.MouseLeftButtonClick, 2));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.MouseMove, 0));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.MouseMove, 0));
+                ActionTemplates.Last().PlaceHolder = true;
+            }
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("ViewModel", "Constructor", e.Message);
+                throw;
+            }
+            
         }
         //Methods
-        
+
         //Commands
-        private void AddMacro(object param)
+        private void AddItemToList(object param)
         {
-            MacroList.Add(new Macro());
-            SelectedMacro = MacroList.Last();
+            var item = param as string;
+            switch (param)
+            {
+                case "Scenario":
+                    Scenarios.Add(new Scenario());
+                    SelectedScenario = Scenarios.Last();
+                    CommandEditItem.Execute(SelectedScenario);
+                    break;
+                case "Macro":
+                    MacroList.Add(new Macro());
+                    SelectedMacro = MacroList.Last();
+                    CommandEditItem.Execute(SelectedMacro);
+                    break;
+                case "ActionTemplate":
+                    ActionTemplate newTemplate = new ActionTemplate();
+                    ActionTemplates.Insert(ActionTemplates.Count - 1, newTemplate);
+                    SelectedTemplate = newTemplate;
+                    CommandEditItem.Execute(SelectedTemplate);
+                    break;
+                default:
+                    Logger.GetLogger().CatchException("ViewModel", "AddItemToList", $"Unknown param{{{item}}}");
+                    throw new Exception();
+            }
         }
-        private void DelMacro(object param)
+        private void RemoveItemFromList(object param)
         {
-            if (param is Macro macro && macro != null)
+            if(param is Scenario scenario)
+            {
+                var index = Scenarios.IndexOf(scenario);
+                Scenarios.Remove(scenario);
+                if (Scenarios.Count > 0)
+                {
+                    if (index < Scenarios.Count)
+                        SelectedScenario = Scenarios[index];
+                    else
+                        SelectedScenario = Scenarios[index - 1];
+                }
+            }
+            else if(param is Macro macro)
             {
                 var index = MacroList.IndexOf(macro);
                 MacroList.Remove(macro);
@@ -163,87 +212,100 @@ namespace Macro_Commander.src
                     else
                         SelectedMacro = MacroList[index - 1];
                 }
-
+            }
+            else if(param is ActionTemplate template)
+            {
+                if (template.PlaceHolder == true)
+                    return;
+                var index = ActionTemplates.IndexOf(template);
+                ActionTemplates.Remove(template);
+                template.HotKey = null;
             }
             else
+            {
+                Logger.GetLogger().CatchException("ViewModel", "RemoveItemFromList", "Unknown param");
                 throw new Exception();
+            }
         }
+        private void EditItem(object param)
+        {
+            if (param is Macro macro)
+                macro.EditingMode = !macro.EditingMode;
+            else if (param is Scenario scenario)
+                scenario.EditingMode = !scenario.EditingMode;
+            else if (param is ActionTemplate template)
+            {
+                if(template.PlaceHolder == false)
+                template.EditingMode = !template.EditingMode;
+            }
+            else
+            {
+                Logger.GetLogger().CatchException("ViewModel", "EditItem", "Unknown param");
+                throw new Exception();
+            }
+        }
+
         private void SaveToFile(object param)
         {
             var path = param as string;
-            ProjectPath = path ?? throw new Exception();
-
-            StartStopEditTemplate(null);
-            ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+            try
             {
-                formatter.Serialize(stream, args);
+                ProjectPath = path ?? throw new Exception("null path");
+                SelectedMacro.EditingMode = false;
+                SelectedScenario.EditingMode = false;
+                SelectedTemplate.EditingMode = false;
+                ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(stream, args);
+                }
             }
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("ViewModel", "SaveToFile", e.Message);
+                throw;
+            }
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"ViewModel: SaveToFile: Path{{{path}}} : Code{{{1}}}");
+#endif
         }
         private void LoadFromFile(object param)
         {
             var path = param as string;
-            ProjectPath = path ?? throw new Exception();
-
-            StartStopEditTemplate(null);
-            BinaryFormatter formatter = new BinaryFormatter();
-            WinWrapper.UnregisterAll();
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+            try
             {
-                ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
-                MacroList = args.MacroList;
-                Scenarios = args.Scenarios;
-                foreach (var action in Scenarios)
-                {
-                    WinWrapper.RegisterKey(action.HotKey);
-                }
-                ActionTemplates = args.ActionTemplates;
-                foreach (var action in ActionTemplates)
-                {
-                    WinWrapper.RegisterKey(action.HotKey);
-                }
-                SelectedMacro = args.SelectedMacro;
-                SelectedScenario = args.SelectedScenario;
-            }
-            
-        }
-        private void AddScenario(object param)
-        {
-            Scenarios.Add(new Scenario());
-            SelectedScenario = Scenarios.Last();
-        }
-        private void AddTemplate(object param)
-        {
-            ActionTemplate newTemplate = new ActionTemplate();
-            ActionTemplates.Insert(ActionTemplates.Count - 1, newTemplate);
-            SelectedTemplate = newTemplate;
-            SelectedTemplate.EditingMode = true;
-        }
-        private void StartStopEditTemplate(object param)
-        {
-            if (param == null)
+                ProjectPath = path ?? throw new Exception("null path");
+                SelectedTemplate.EditingMode = false;
                 SelectedTemplate = null;
-            else
-            {
-                var template = param as ActionTemplate;
-                if (template == null)
-                    throw new Exception();
-                template.EditingMode = true;
+                BinaryFormatter formatter = new BinaryFormatter();
+                WinWrapper.UnregisterAll();
+                using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
+                    MacroList = args.MacroList;
+                    Scenarios = args.Scenarios;
+                    foreach (var action in Scenarios)
+                    {
+                        WinWrapper.RegisterKey(action.HotKey);
+                    }
+                    ActionTemplates = args.ActionTemplates;
+                    foreach (var action in ActionTemplates)
+                    {
+                        WinWrapper.RegisterKey(action.HotKey);
+                    }
+                    SelectedMacro = args.SelectedMacro;
+                    SelectedScenario = args.SelectedScenario;
+                }
             }
-        }
-        private void DelTemplate(object param)
-        {
-            if (param is ActionTemplate action && action != null)
+            catch (Exception e)
             {
-                if (action.PlaceHolder == true)
-                    return;
-                var index = ActionTemplates.IndexOf(action);
-                ActionTemplates.Remove(action);
-                StartStopEditTemplate(null);
+                Logger.GetLogger().CatchException("ViewModel", "LoadFromFile", e.Message);
+                throw;
             }
-            else
-                throw new Exception();
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"ViewModel: LoadFromFile: Path{{{path}}} : Code{{{1}}}");
+#endif
         }
         private async void ExecuteScenarioAsync(object param)
         {
@@ -293,8 +355,9 @@ namespace Macro_Commander.src
                         
                     }, token);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.GetLogger().CatchException("ViewModel", "ExecuteScenarioAsync", e.Message);
                     throw new Exception();
                 }
                 finally

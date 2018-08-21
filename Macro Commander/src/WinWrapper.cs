@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUGLOG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -101,11 +103,12 @@ namespace Macro_Commander.src
         };
 
         private const double ABSOLUTE = 65535;
-        private static UInt32 ABSOLUTE_FLAG = 0x8000;
-        private static UInt32 MOUSE_MOVE = 0x0001;
-        private static UInt32 MOUSE_BUTTONDOWN = 0x0002;
-        private static UInt32 MOUSE_BUTTONUP = 0x0004;
-        private static UInt32 WHEEL_ROTATE = 0x0800;
+        private static UInt32 MOUSEEVENTF_ABSOLUTE = 0x8000;
+        private static UInt32 MOUSEEVENTF_MOVE = 0x0001;
+        private static UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
+        private static UInt32 MOUSEEVENTF_LEFTUP = 0x0004;
+        private static UInt32 MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        private static UInt32 MOUSEEVENTF_RIGHTUP = 0x0010;
 
         private const double SCREEN_WIDTH = 1360;
         private const double SCREEN_HEIGHT = 768;
@@ -125,47 +128,93 @@ namespace Macro_Commander.src
         public static extern bool GetCursorPos(ref Point point);
 
 
-        public static void Click(uint x, uint y)
+        public static void MouseLeftButtonClick(uint x, uint y)
         {
-            mouse_event(ABSOLUTE_FLAG | MOUSE_MOVE, (uint)(x  * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
-            mouse_event(MOUSE_BUTTONDOWN, 0, 0, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x  * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, IntPtr.Zero);
             Thread.Sleep(CLICK_SENSITIVITY);
-            mouse_event(MOUSE_BUTTONUP, 0, 0, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, IntPtr.Zero);
+        }
+        public static void MouseRightButtonClick(uint x, uint y)
+        {
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
+            mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, IntPtr.Zero);
+            Thread.Sleep(CLICK_SENSITIVITY);
+            mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, IntPtr.Zero);
+        }
+        public static void MouseMove(uint x,uint y)
+        {
+            mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, (uint)(x * (ABSOLUTE / SCREEN_WIDTH)) + 1, (uint)(y * (ABSOLUTE / SCREEN_HEIGHT)) + 1, 0, IntPtr.Zero);
         }
 
         public static void RegisterKey(HotKey key)
         {
-            if (key == null || key.Key == null)
-                return;
-            var exist = from k in HotKeys where k.Key == key.Key select k;
-            if(exist.Count() > 0)
+            int result = 0;
+            try
             {
-                UnregisterKey(exist.First());
+                if (key == null || key.Key == null)
+                    return;
+                var exist = from k in HotKeys where k.Key == key.Key select k;
+                if (exist.Count() > 0)
+                {
+                    UnregisterKey(exist.First());
+                }
+                result = RegisterHotKey(hWnd, key.Id, key.StringModifier == null ? 0 : (uint)KeyDict[key.StringModifier], KeyDict[key.Key]);
             }
-            var result = RegisterHotKey(hWnd, key.Id, key.StringModifier == null ? 0 : (uint)KeyDict[key.StringModifier] , KeyDict[key.Key]);
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("WinWrapper", "RegisterHotKey", e.Message);
+                throw;
+            }
+#if DEBUGLOG
+            Logger.GetLogger().WriteToLog($"WinWrapper: RegisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
             HotKeys.Add(key);
         }
         public static void UnregisterKey(HotKey key)
         {
+            int result = 0;
             if (hWnd != null)
             {
                 if (key == null)
                     return;
-                var x = UnregisterHotKey(hWnd, key.Id);
-                HotKeys.Remove(key);
-                HotKey.IdSet.Remove(key.Id);
+                try
+                {
+                    result = UnregisterHotKey(hWnd, key.Id);
+                    HotKeys.Remove(key);
+                    HotKey.IdSet.Remove(key.Id);
+                }
+                catch (Exception e)
+                {
+                    Logger.GetLogger().CatchException("WinWrapper", "RegisterHotKey", e.Message);
+                    throw;
+                }
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterHotKey : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
+
             }
             else
+            {
+                Logger.GetLogger().CatchException("WinWrapper", "UnRegisterHotKey", "hWnd is null");
                 throw new Exception("hWnd is null");
+            }
+            
 
         }
         public static void UnregisterAll()
         {
             if (hWnd == null)
-                throw new Exception();
-            foreach (var item in HotKeys)
             {
-                UnregisterHotKey(hWnd, item.Id);
+                Logger.GetLogger().CatchException("WinWrapper", "UnregisterAll", "hWnd is null");
+                throw new Exception();
+            }
+            foreach (var key in HotKeys)
+            {
+                var result = UnregisterHotKey(hWnd, key.Id);
+#if DEBUGLOG
+                Logger.GetLogger().WriteToLog($"WinWrapper: UnregisterAll : Key{{{key.StringModifier} {key.Key}}}, Id{{{key.Id}}} : Code{{{result}}}");
+#endif
             }
             HotKeys.Clear();
         }

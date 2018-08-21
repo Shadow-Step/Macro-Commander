@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUGLOG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,9 +63,14 @@ namespace Macro_Commander.src
                     break;
                 }
                 if (i == 999)
+                {
+#if DEBUGLOG
+                    Logger.GetLogger().WriteToLog($"HotKey: CreateHotKey : Exception{{ID limit}} : Code{{{0}}}");
+#endif
                     throw new Exception();
+                }
             }
-            if(key != null)
+            if (key != null)
             WinWrapper.RegisterKey(temp);
             return temp;
         }

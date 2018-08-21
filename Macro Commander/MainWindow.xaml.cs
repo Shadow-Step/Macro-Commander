@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUGLOG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,19 +35,44 @@ namespace Macro_Commander
         //Window
         public MainWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception e)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Constructor", e.Message);
+                throw;
+            }
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            hWnd = new WindowInteropHelper(this).Handle;
-            source = HwndSource.FromHwnd(hWnd);
-            source.AddHook(MsgListener);
-            WinWrapper.hWnd = hWnd;
-            this.DataContext = ViewModel.viewModel;
+            try
+            {
+                hWnd = new WindowInteropHelper(this).Handle;
+                source = HwndSource.FromHwnd(hWnd);
+                source.AddHook(MsgListener);
+                WinWrapper.hWnd = hWnd;
+                this.DataContext = ViewModel.viewModel;
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Window_Loaded", ex.Message);
+                throw;
+            }
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            WinWrapper.UnregisterAll();
+            try
+            {
+                WinWrapper.UnregisterAll();
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "Window_Closing",ex.Message);
+                throw;
+            }
+            
         }
 
         //Methods
@@ -54,12 +80,18 @@ namespace Macro_Commander
         //Global message listener
         private IntPtr MsgListener(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+            try
+            {
             const int WM_HOTKEY = 0x0312;
             switch (msg)
             {
                 case WM_HOTKEY:
                     var l = lParam.ToInt32();
                     var w = wParam.ToInt32();
+#if DEBUGLOG
+                    short code = 0;
+                    string command = "null";
+#endif
                     foreach (var key in WinWrapper.HotKeys)
                     {
                         int shortcode = WinWrapper.KeyDict[key.Key]; 
@@ -74,7 +106,11 @@ namespace Macro_Commander
                                         if(template.HotKey == key)
                                         {
                                             var pos = System.Windows.Forms.Cursor.Position;
-                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 48, pos.X, pos.Y)));
+                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
+#if DEBUGLOG
+                                            command = "CommandAddAction";
+                                            code = 1;
+#endif
                                         }
                                     }
                                     break;
@@ -85,19 +121,32 @@ namespace Macro_Commander
                                         {
                                             ViewModel.viewModel.SelectedScenario = scen;
                                             ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
+#if DEBUGLOG
+                                            command = "CommandExecuteScenarioAsync";
+                                            code = 1;
+#endif
                                         }
                                     }
                                     break;
                                 default:
                                     break;
                             }
+
                         }
                     }
+#if DEBUGLOG
+                    Logger.GetLogger().WriteToLog($"MsgListener: MessageReceived: Msg{{{WM_HOTKEY}}}, l{{{l}}}, w{{{w}}} : Command{{{command}}}, Code{{{code}}}");
+#endif
                     break;
                 default:
                     break;
             }
-
+            }
+            catch (Exception ex)
+            {
+                Logger.GetLogger().CatchException("MainWindow", "MsgListener", ex.Message);
+                throw;
+            }
             return IntPtr.Zero;
         }
         
@@ -120,54 +169,13 @@ namespace Macro_Commander
         {
             if (((sender as ListBoxItem).Content as ActionTemplate).PlaceHolder)
             {
-                ViewModel.viewModel.CommandAddTemplate.Execute(null);
+                ViewModel.viewModel.CommandAddItemToList.Execute("ActionTemplate");
             }
             else
                 ViewModel.viewModel.SelectedTemplate.EditingMode = true;
         }
-
-        private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
-                return;
-            Keyboard.ClearFocus();
-            if (ViewModel.viewModel.SelectedScenario != null)
-                ViewModel.viewModel.SelectedScenario.HotKey = KeyList[1] == Key.None ?
-                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[0].ToString()) :
-                    HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
-            KeyList[0] = KeyList[1] = Key.None;
-        }
-        private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[0] == Key.None && KeyList[1] == Key.None)
-                return;
-            Keyboard.ClearFocus();
-            if (ViewModel.viewModel.SelectedTemplate != null)
-                ViewModel.viewModel.SelectedTemplate.HotKey = KeyList[1] == Key.None ? 
-                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[0].ToString()) : 
-                    HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
-            KeyList[0] = KeyList[1] = Key.None;
-        }
-
-        private void ActionTemplateHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[0] == Key.None)
-                KeyList[0] = e.Key;
-            else
-                KeyList[1] = e.Key;
-        }
-        private void ScenarioHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[0] == Key.None)
-                KeyList[0] = e.Key;
-            else
-                KeyList[1] = e.Key;
-        }
-        private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
-        {
-            ViewModel.viewModel.CommandStartStopEditTemplate.Execute(null);
-        }
-
+                
+        //Menu
         private void MenuNewClick(object sender, RoutedEventArgs e)
         {
 
@@ -213,5 +221,103 @@ namespace Macro_Commander
                 ViewModel.viewModel.CommandSaveToFile.Execute(saveFile.FileName);
             }
         }
+
+        //Windows
+        private void ShowHelpWindow(object sender, RoutedEventArgs e)
+        {
+            win.HelpWindow window = new win.HelpWindow();
+            window.Show();
+        }
+
+        //Keyboard and Focus events
+        private void MacrosListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                if (ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode == false)
+                    ViewModel.viewModel.CommandRemoveItemFromList.Execute(ViewModel.viewModel.SelectedMacro);
+            }
+        }
+
+        private void HotKeyTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                case Key.LeftShift:
+                case Key.RightShift:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    KeyList[0] = e.Key;
+                    break;
+                default:
+                    KeyList[1] = e.Key;
+                    break;
+            }
+        }
+        private void HotKeyTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (KeyList[1] == Key.None)
+                return;
+            if (!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
+            {
+                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
+                return;
+            }
+            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
+            {
+                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
+                return;
+            }
+
+            Keyboard.ClearFocus();
+            switch ((sender as System.Windows.Controls.TextBox).Name)
+            {
+                case "ScenarioHotKeyTextBox":
+                    if (ViewModel.viewModel.SelectedScenario != null)
+                        ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
+                    break;
+                case "TemplateHotKeyTextBox":
+                    if (ViewModel.viewModel.SelectedTemplate != null)
+                        ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
+                    break;
+                default:
+                    Logger.GetLogger().CatchException("MainWindow", "HotKeyTextBox_KeyUp", "Unknown TextBox.Name");
+                    throw new Exception();
+            }
+            KeyList[0] = KeyList[1] = Key.None;
+        }
+
+        private void EditNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if(ViewModel.viewModel.SelectedScenario != null && ViewModel.viewModel.SelectedScenario.EditingMode)
+                    ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
+                else if(ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode)
+                    ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
+            }
+        }
+        private void EditNameTextBox_LostKeyboardFocus(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.viewModel.SelectedScenario != null && ViewModel.viewModel.SelectedScenario.EditingMode)
+                ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
+            else if (ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode)
+                ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
+        }
+        private void EditNameTextBox_Initialized(object sender, EventArgs e)
+        {
+            var box = sender as System.Windows.Controls.TextBox;
+            box.Focus();
+            box.SelectAll();
+        }
+        
+        //Other events
+        private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
+        {
+            ViewModel.viewModel.CommandEditItem.Execute(ViewModel.viewModel.SelectedTemplate);
+        }
+
     }
 }

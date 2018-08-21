@@ -8,8 +8,8 @@ namespace Macro_Commander.enu
 {
     public enum ActionType
     {
-        LeftClick,
-        RightClick,
-        Pause
+        MouseLeftButtonClick,
+        MouseRightButtonClick,
+        MouseMove
     }
 }
