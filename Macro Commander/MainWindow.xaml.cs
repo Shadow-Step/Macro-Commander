@@ -174,87 +174,8 @@ namespace Macro_Commander
             else
                 ViewModel.viewModel.SelectedTemplate.EditingMode = true;
         }
-
-        private void ScenarioHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[1] == Key.None)
-                return;
-            if(!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
-            {
-                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
-                return;
-            }
-
-            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
-            {
-                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
-                return;
-            }
-            Keyboard.ClearFocus();
-            if (ViewModel.viewModel.SelectedScenario != null)
-                ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
-            KeyList[0] = KeyList[1] = Key.None;
-        }
-        private void ActionTemplateHotKeyInit(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (KeyList[1] == Key.None)
-                return;
-            if (!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
-            {
-                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
-                return;
-            }
-
-            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
-            {
-                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
-                return;
-            }
-            Keyboard.ClearFocus();
-            if (ViewModel.viewModel.SelectedTemplate != null)
-                ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
-            KeyList[0] = KeyList[1] = Key.None;
-        }
-
-        private void ActionTemplateHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.LeftAlt:
-                case Key.RightAlt:
-                case Key.LeftShift:
-                case Key.RightShift:
-                case Key.LeftCtrl:
-                case Key.RightCtrl:
-                    KeyList[0] = e.Key;
-                    break;
-                default:
-                    KeyList[1] = e.Key;
-                    break;
-            }
-        }
-        private void ScenarioHotKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.LeftAlt:
-                case Key.RightAlt:
-                case Key.LeftShift:
-                case Key.RightShift:
-                case Key.LeftCtrl:
-                case Key.RightCtrl:
-                    KeyList[0] = e.Key;
-                    break;
-                default:
-                    KeyList[1] = e.Key;
-                    break;
-            }
-        }
-        private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
-        {
-            ViewModel.viewModel.CommandEditItem.Execute(ViewModel.viewModel.SelectedTemplate);
-        }
-
+                
+        //Menu
         private void MenuNewClick(object sender, RoutedEventArgs e)
         {
 
@@ -301,35 +222,102 @@ namespace Macro_Commander
             }
         }
 
+        //Windows
         private void ShowHelpWindow(object sender, RoutedEventArgs e)
         {
             win.HelpWindow window = new win.HelpWindow();
             window.Show();
         }
 
-        private void EditMacroNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if(e.Key == Key.Enter)
-            {
-                ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
-            }
-        }
-        private void EditScenarioNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
-            }
-        }
+        //Keyboard and Focus events
         private void MacrosListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Key == Key.Delete)
+            if (e.Key == Key.Delete)
             {
-                if (ViewModel.viewModel.SelectedMacro != null)
+                if (ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode == false)
                     ViewModel.viewModel.CommandRemoveItemFromList.Execute(ViewModel.viewModel.SelectedMacro);
             }
         }
 
+        private void HotKeyTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                case Key.LeftShift:
+                case Key.RightShift:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    KeyList[0] = e.Key;
+                    break;
+                default:
+                    KeyList[1] = e.Key;
+                    break;
+            }
+        }
+        private void HotKeyTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (KeyList[1] == Key.None)
+                return;
+            if (!WinWrapper.KeyDict.ContainsKey(e.Key.ToString()))
+            {
+                System.Windows.MessageBox.Show($"Unsupported HotKey - {e.Key.ToString()}");
+                return;
+            }
+            if (WinWrapper.HotKeys.Count(x => x.Key == e.Key.ToString()) > 0)
+            {
+                System.Windows.MessageBox.Show($"HotKey already registered - {e.Key.ToString()}");
+                return;
+            }
+
+            Keyboard.ClearFocus();
+            switch ((sender as System.Windows.Controls.TextBox).Name)
+            {
+                case "ScenarioHotKeyTextBox":
+                    if (ViewModel.viewModel.SelectedScenario != null)
+                        ViewModel.viewModel.SelectedScenario.HotKey = HotKey.CreateHotKey(HotKeyStatus.ExecuteScenario, KeyList[1].ToString(), KeyList[0]);
+                    break;
+                case "TemplateHotKeyTextBox":
+                    if (ViewModel.viewModel.SelectedTemplate != null)
+                        ViewModel.viewModel.SelectedTemplate.HotKey = HotKey.CreateHotKey(HotKeyStatus.AddAction, KeyList[1].ToString(), KeyList[0]);
+                    break;
+                default:
+                    Logger.GetLogger().CatchException("MainWindow", "HotKeyTextBox_KeyUp", "Unknown TextBox.Name");
+                    throw new Exception();
+            }
+            KeyList[0] = KeyList[1] = Key.None;
+        }
+
+        private void EditNameTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if(ViewModel.viewModel.SelectedScenario != null && ViewModel.viewModel.SelectedScenario.EditingMode)
+                    ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
+                else if(ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode)
+                    ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
+            }
+        }
+        private void EditNameTextBox_LostKeyboardFocus(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.viewModel.SelectedScenario != null && ViewModel.viewModel.SelectedScenario.EditingMode)
+                ViewModel.viewModel.SelectedScenario.Name = (sender as System.Windows.Controls.TextBox).Text;
+            else if (ViewModel.viewModel.SelectedMacro != null && ViewModel.viewModel.SelectedMacro.EditingMode)
+                ViewModel.viewModel.SelectedMacro.Name = (sender as System.Windows.Controls.TextBox).Text;
+        }
+        private void EditNameTextBox_Initialized(object sender, EventArgs e)
+        {
+            var box = sender as System.Windows.Controls.TextBox;
+            box.Focus();
+            box.SelectAll();
+        }
         
+        //Other events
+        private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
+        {
+            ViewModel.viewModel.CommandEditItem.Execute(ViewModel.viewModel.SelectedTemplate);
+        }
+
     }
 }

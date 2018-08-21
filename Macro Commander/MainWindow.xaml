@@ -79,7 +79,7 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="0 2 0 0" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Clicks:"/>
 
 
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyDown="ActionTemplateHotKeyDown" KeyUp="ActionTemplateHotKeyInit"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0 2 0 0" x:Name="TemplateHotKeyTextBox" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyDown="HotKeyTextBox_KeyDown" KeyUp="HotKeyTextBox_KeyUp"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Pause}"/>
                     <TextBox Grid.Row="3" Grid.Column="1" Margin="0 2 0 0" Text="{Binding Path=Times}"/>
 
@@ -169,6 +169,7 @@
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="22"/>
         </Style>
+        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -300,7 +301,7 @@
                                         <TextBlock Text="{Binding Path=Name}"/>
                                     </DataTemplate>
                                     <DataTemplate x:Key="EditTemplate">
-                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}" KeyUp="EditScenarioNameTextBox_KeyUp"/>
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}" Initialized="EditNameTextBox_Initialized" LostKeyboardFocus="EditNameTextBox_LostKeyboardFocus" KeyUp="EditNameTextBox_KeyUp"/>
                                     </DataTemplate>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="ContentTemplate" Value="{StaticResource OriginTemplate}"/>
@@ -328,7 +329,7 @@
                         </ListBox.ItemsPanel>
                     </ListBox>
                     </GroupBox>
-                    <!-- Options Grid-->
+                    <!-- Properties Grid-->
                     <GroupBox Margin="3 3 3 3" Header="Properties" Grid.Row="2" Grid.Column="2">
                         <Grid DataContext="{Binding Path=SelectedScenario}">
                         <Grid.ColumnDefinitions>
@@ -351,7 +352,7 @@
                         <ComboBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=ExecutionMode}"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=DelayTime}"/>
                         <TextBox Grid.Row="2" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=LoopTime}"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" Text="{Binding Path=HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}" KeyDown="ScenarioHotKeyDown" KeyUp="ScenarioHotKeyInit" />
+                            <TextBox Grid.Row="3" Grid.Column="1" Margin="5 2 0 0" x:Name="ScenarioHotKeyTextBox" Text="{Binding Path=HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}" KeyDown="HotKeyTextBox_KeyDown" KeyUp="HotKeyTextBox_KeyUp" />
                         <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=DelayedLaunch}"/>
 
                     </Grid>
@@ -479,7 +480,7 @@
                                         <TextBlock Text="{Binding Path=Name}"/>
                                     </DataTemplate>
                                     <DataTemplate x:Key="EditTemplate">
-                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}" KeyUp="EditMacroNameTextBox_KeyUp"/>
+                                            <TextBox Text="{Binding Path=Name, Mode=TwoWay}" Initialized="EditNameTextBox_Initialized" LostKeyboardFocus="EditNameTextBox_LostKeyboardFocus" KeyUp="EditNameTextBox_KeyUp"/>
                                     </DataTemplate>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="ContentTemplate" Value="{StaticResource OriginTemplate}"/>
