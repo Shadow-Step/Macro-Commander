@@ -183,6 +183,7 @@ namespace Macro_Commander.src
                     CommandEditItem.Execute(SelectedTemplate);
                     break;
                 default:
+                    Logger.GetLogger().CatchException("ViewModel", "AddItemToList", $"Unknown param{{{item}}}");
                     throw new Exception();
             }
         }
@@ -222,6 +223,7 @@ namespace Macro_Commander.src
             }
             else
             {
+                Logger.GetLogger().CatchException("ViewModel", "RemoveItemFromList", "Unknown param");
                 throw new Exception();
             }
         }
@@ -238,6 +240,7 @@ namespace Macro_Commander.src
             }
             else
             {
+                Logger.GetLogger().CatchException("ViewModel", "EditItem", "Unknown param");
                 throw new Exception();
             }
         }
@@ -247,7 +250,7 @@ namespace Macro_Commander.src
             var path = param as string;
             try
             {
-                ProjectPath = path ?? throw new Exception();
+                ProjectPath = path ?? throw new Exception("null path");
                 SelectedMacro.EditingMode = false;
                 SelectedScenario.EditingMode = false;
                 SelectedTemplate.EditingMode = false;
@@ -260,9 +263,7 @@ namespace Macro_Commander.src
             }
             catch (Exception e)
             {
-#if DEBUGLOG
-                Logger.GetLogger().WriteToLog($"ViewModel: SaveToFile: Path{{{path}}}, Exception{{{e.Message}}} : Code{{{0}}}");
-#endif
+                Logger.GetLogger().CatchException("ViewModel", "SaveToFile", e.Message);
                 throw;
             }
 #if DEBUGLOG
@@ -274,7 +275,7 @@ namespace Macro_Commander.src
             var path = param as string;
             try
             {
-                ProjectPath = path ?? throw new Exception();
+                ProjectPath = path ?? throw new Exception("null path");
                 SelectedTemplate.EditingMode = false;
                 SelectedTemplate = null;
                 BinaryFormatter formatter = new BinaryFormatter();
@@ -299,9 +300,7 @@ namespace Macro_Commander.src
             }
             catch (Exception e)
             {
-#if DEBUGLOG
-                Logger.GetLogger().WriteToLog($"ViewModel: LoadFromFile: Path{{{path}}}, Exception{{{e.Message}}} : Code{{{0}}}");
-#endif
+                Logger.GetLogger().CatchException("ViewModel", "LoadFromFile", e.Message);
                 throw;
             }
 #if DEBUGLOG
@@ -356,8 +355,9 @@ namespace Macro_Commander.src
                         
                     }, token);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.GetLogger().CatchException("ViewModel", "ExecuteScenarioAsync", e.Message);
                     throw new Exception();
                 }
                 finally
