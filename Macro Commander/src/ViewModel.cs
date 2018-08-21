@@ -93,6 +93,17 @@ namespace Macro_Commander.src
                 PropChanged("SelectedScenario");
             }
         }
+        public ActionTemplate SelectedTemplate
+        {
+            get { return _selectedTemplate; }
+            set
+            {
+                if (SelectedTemplate != null && SelectedTemplate.EditingMode == true)
+                    _selectedTemplate.EditingMode = false;
+                _selectedTemplate = value;
+                PropChanged("SelectedTemplate");
+            }
+        }
         public string ProjectPath
         {
             get { return _projectPath; }
@@ -111,17 +122,6 @@ namespace Macro_Commander.src
                 PropChanged("ExecutionStarted");
             }
         }
-        public ActionTemplate SelectedTemplate
-        {
-            get { return _selectedTemplate; }
-            set
-            {
-                if(SelectedTemplate != null && SelectedTemplate.EditingMode == true)
-                _selectedTemplate.EditingMode = false;
-                _selectedTemplate = value;
-                PropChanged("SelectedTemplate");
-            }
-        }
         
         //Commands
         public RelayCommand CommandSaveToFile { get; set; }
@@ -130,6 +130,7 @@ namespace Macro_Commander.src
         public RelayCommand CommandEditItem { get; set; }
         public RelayCommand CommandAddItemToList { get; set; }
         public RelayCommand CommandRemoveItemFromList { get; set; }
+        public RelayCommand CommandNewProject { get; set; }
         //Constructor
         private ViewModel()
         {
@@ -141,15 +142,16 @@ namespace Macro_Commander.src
                 CommandEditItem = new RelayCommand(EditItem, x => x != null);
                 CommandAddItemToList = new RelayCommand(AddItemToList);
                 CommandRemoveItemFromList = new RelayCommand(RemoveItemFromList, x => x != null);
+                CommandNewProject = new RelayCommand(NewProject);
                 MacroList = new ObservableCollection<Macro>();
                 Scenarios = new ObservableCollection<Scenario>();
                 ActionTemplates = new ObservableCollection<ActionTemplate>();
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 500, enu.ActionType.MouseLeftButtonClick, 1));
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 500, enu.ActionType.MouseRightButtonClick, 1));
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 500, enu.ActionType.MouseLeftButtonClick, 2));
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3000, enu.ActionType.MouseMove, 0));
-                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null), 3000, enu.ActionType.MouseMove, 0));
-                ActionTemplates.Last().PlaceHolder = true;
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F1"), 0.5, enu.ActionType.MouseLeftButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F2"), 0.5, enu.ActionType.MouseRightButtonClick, 1));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 0.5, enu.ActionType.MouseLeftButtonClick, 2));
+                ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3, enu.ActionType.MouseMove, 0));
+                ActionTemplates.Add(ActionTemplate.GetPlaceHolder());
+                
             }
             catch (Exception e)
             {
@@ -251,9 +253,6 @@ namespace Macro_Commander.src
             try
             {
                 ProjectPath = path ?? throw new Exception("null path");
-                SelectedMacro.EditingMode = false;
-                SelectedScenario.EditingMode = false;
-                SelectedTemplate.EditingMode = false;
                 ViewModelArgs args = ViewModelArgs.CreateFromViewModel(this);
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
@@ -276,8 +275,6 @@ namespace Macro_Commander.src
             try
             {
                 ProjectPath = path ?? throw new Exception("null path");
-                SelectedTemplate.EditingMode = false;
-                SelectedTemplate = null;
                 BinaryFormatter formatter = new BinaryFormatter();
                 WinWrapper.UnregisterAll();
                 using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
@@ -307,6 +304,17 @@ namespace Macro_Commander.src
             Logger.GetLogger().WriteToLog($"ViewModel: LoadFromFile: Path{{{path}}} : Code{{{1}}}");
 #endif
         }
+        private void NewProject(object param)
+        {
+            SelectedMacro = null;
+            SelectedScenario = null;
+            SelectedTemplate = null;
+            MacroList.Clear();
+            Scenarios.Clear();
+            ActionTemplates.Clear();
+            ActionTemplates.Add(ActionTemplate.GetPlaceHolder());
+            ProjectPath = null;
+        }
         private async void ExecuteScenarioAsync(object param)
         {
             if (!ExecutionStarted)
@@ -334,7 +342,7 @@ namespace Macro_Commander.src
                                 foreach (var action in macros.Actions)
                                 {
                                     action.Execute();
-                                    var SleepTime = DateTime.Now.AddMilliseconds(action.Pause);
+                                    var SleepTime = DateTime.Now.AddSeconds(action.Pause);
                                     while (DateTime.Now < SleepTime)
                                     {
                                         if (token.IsCancellationRequested)
@@ -371,5 +379,6 @@ namespace Macro_Commander.src
                 _tokenSource?.Cancel();
             }
         }
+
     }
 }
