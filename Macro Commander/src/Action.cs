@@ -18,10 +18,10 @@ namespace Macro_Commander.src
         //Fields
         private UInt32 _x = 0;
         private UInt32 _y = 0;
-        private int _pause = 0;
+        private double _pause = 0;
         private Bitmap _image;
         private ActionType _action_type;
-        private int _times;
+        private int _clicks;
         //Properties
         public UInt32 X
         {
@@ -59,7 +59,7 @@ namespace Macro_Commander.src
                 PropChanged("ActionType");
             }
         }
-        public int Pause
+        public double Pause
         {
             get { return _pause; }
             set
@@ -68,13 +68,13 @@ namespace Macro_Commander.src
                 PropChanged("Pause");
             }
         }
-        public int Times
+        public int Clicks
         {
-            get { return _times; }
+            get { return _clicks; }
             set
             {
-                _times = value;
-                PropChanged("Times");
+                _clicks = value;
+                PropChanged("Clicks");
             }
         }
         //Constructors
@@ -94,7 +94,7 @@ namespace Macro_Commander.src
             Image = meta.Bitmap;
             Pause = meta.Template.Pause;
             ActionType = meta.Template.ActionType;
-            Times = meta.Template.Times;
+            Clicks = meta.Template.Clicks;
         }
         public Action(ActionTemplate template, UInt32 x, UInt32 y, Bitmap image) : base()
         {
@@ -111,11 +111,11 @@ namespace Macro_Commander.src
             switch (ActionType)
             {
                 case ActionType.MouseLeftButtonClick:
-                    for (int i = 0; i < Times; i++)
+                    for (int i = 0; i < Clicks; i++)
                         WinWrapper.MouseLeftButtonClick(X, Y);
                     break;
                 case ActionType.MouseRightButtonClick:
-                    for (int i = 0; i < Times; i++)
+                    for (int i = 0; i < Clicks; i++)
                         WinWrapper.MouseRightButtonClick(X, Y);
                     break;
                 case ActionType.MouseMove:
