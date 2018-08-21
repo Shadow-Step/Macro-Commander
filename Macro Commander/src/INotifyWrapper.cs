@@ -12,7 +12,7 @@ namespace Macro_Commander.src
     {
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
-        public void PropChanged(string property)
+        public void PropChanged([System.Runtime.CompilerServices.CallerMemberName] string property = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
