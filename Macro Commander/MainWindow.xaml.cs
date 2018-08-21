@@ -119,6 +119,8 @@ namespace Macro_Commander
                                     {
                                         if (scen.HotKey.Key == key.Key)
                                         {
+                                            if(ViewModel.viewModel.ExecutionStarted)
+                                                    ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
                                             ViewModel.viewModel.SelectedScenario = scen;
                                             ViewModel.viewModel.CommandExecuteScenarioAsync.Execute(null);
 #if DEBUGLOG
@@ -178,7 +180,10 @@ namespace Macro_Commander
         //Menu
         private void MenuNewClick(object sender, RoutedEventArgs e)
         {
-
+            if(System.Windows.MessageBox.Show("message") == MessageBoxResult.OK)
+            {
+                ViewModel.viewModel.CommandNewProject.Execute(null);
+            }
         }
         private void MenuOpenClick(object sender, RoutedEventArgs e)
         {
@@ -313,6 +318,7 @@ namespace Macro_Commander
             box.SelectAll();
         }
         
+       
         //Other events
         private void AcceptActionTemplateChanges(object sender, RoutedEventArgs e)
         {
