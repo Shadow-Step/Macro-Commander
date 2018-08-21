@@ -110,6 +110,7 @@ namespace Macro_Commander.src
             get { return _hotKey; }
             set
             {
+                if(_hotKey != null)
                 WinWrapper.UnregisterKey(_hotKey);
                 _hotKey = value;
                 PropChanged("HotKey");

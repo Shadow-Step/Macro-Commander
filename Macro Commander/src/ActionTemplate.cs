@@ -50,6 +50,7 @@ namespace Macro_Commander.src
             get { return _hotKey; }
             set
             {
+                if(_hotKey != null)
                 WinWrapper.UnregisterKey(_hotKey);
                 _hotKey = value;
                 PropChanged("HotKey");
@@ -78,7 +79,6 @@ namespace Macro_Commander.src
         {
             Pause = 0;
             Times = 0;
-            HotKey = HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, null);
             PlaceHolder = false;
             ActionType = enu.ActionType.MouseLeftButtonClick;
         }
