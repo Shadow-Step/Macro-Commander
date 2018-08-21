@@ -12,9 +12,9 @@ namespace Macro_Commander.src
     {
         //Fields
         private enu.ActionType _actionType;
-        private int _pause;
+        private double _pause;
         private HotKey _hotKey;
-        private int _times;
+        private int _clicks;
         private bool _placeHolder;
         private bool _editingMode;
         //Properties
@@ -27,7 +27,7 @@ namespace Macro_Commander.src
                 PropChanged("ActionType");
             }
         }
-        public int Pause
+        public double Pause
         {
             get { return +_pause; }
             set
@@ -36,13 +36,13 @@ namespace Macro_Commander.src
                 PropChanged("Pause");
             }
         }
-        public int Times
+        public int Clicks
         {
-            get { return _times; }
+            get { return _clicks; }
             set
             {
-                _times = value;
-                PropChanged("Times");
+                _clicks = value;
+                PropChanged("Clicks");
             }
         }
         public HotKey HotKey
@@ -78,18 +78,30 @@ namespace Macro_Commander.src
         public ActionTemplate()
         {
             Pause = 0;
-            Times = 0;
+            Clicks = 0;
             PlaceHolder = false;
             ActionType = enu.ActionType.MouseLeftButtonClick;
         }
-        public ActionTemplate(HotKey hotkey, int pause, enu.ActionType actionType,int times)
+        public ActionTemplate(HotKey hotkey, double pause, enu.ActionType actionType,int clicks)
         {
             HotKey = hotkey;
             Pause = pause;
             ActionType = actionType;
-            Times = times;
+            Clicks = clicks;
         }
-        
+        //Factory
+        public static ActionTemplate GetPlaceHolder()
+        {
+            ActionTemplate temp = new ActionTemplate()
+            {
+                HotKey = null,
+                PlaceHolder = true,
+                ActionType = enu.ActionType.MouseMove,
+                Clicks = 0,
+                Pause = 0
+            };
+            return temp;
+        }
         //Methods
     }
 }
