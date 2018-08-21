@@ -37,7 +37,7 @@ namespace Macro_Commander.src
                     _name = "None";
                 else
                     _name = value;
-                PropChanged("Name");
+                PropChanged();
                 EditingMode = false;
             }
         }
@@ -59,7 +59,7 @@ namespace Macro_Commander.src
             set
             {
                 _totalExecutionTime = value;
-                PropChanged("TotalExecutionTime");
+                PropChanged();
             }
 
         }
@@ -87,7 +87,6 @@ namespace Macro_Commander.src
             CommandMoveForward = new RelayCommand(MoveActionForward);
             CommandMoveBackwards = new RelayCommand(MoveActionBackwards);
             Actions = new ObservableCollection<Action>();
-            Actions.CollectionChanged += Actions_CollectionChanged;
             Name = "New Macro";
         }
 
@@ -175,10 +174,6 @@ namespace Macro_Commander.src
                 }
             }
         }
-        //TEMP!!!
-        private void Actions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            PropChanged("TotalExecutionTime");
-        }
+        
     }
 }
