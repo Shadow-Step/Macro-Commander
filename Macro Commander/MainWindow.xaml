@@ -90,7 +90,7 @@
                     <TextBlock Grid.Row="3" Style="{StaticResource PropertyTextBlock}" FontWeight="Bold" FontSize="12" Foreground="Black" Text="Clicks:"/>
 
 
-                    <TextBox Grid.Row="1" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyDown="HotKeyTextBox_KeyDown" KeyUp="HotKeyTextBox_KeyUp"/>
+                    <TextBox Grid.Row="1" x:Name="TemplateHotKeyTextBox" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=HotKey,Converter={StaticResource HotKeyConverter}}" KeyDown="HotKeyTextBox_KeyDown" KeyUp="HotKeyTextBox_KeyUp"/>
                     <TextBox Grid.Row="2" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=Pause}"/>
                     <TextBox Grid.Row="3" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=Clicks}"/>
 
@@ -265,7 +265,7 @@
                             </Grid>
                             <!--Scenario macros-->
                             <GroupBox Margin="3 3 3 3" Header="Scenario macros" Grid.Column="0" Grid.Row="1">
-                                <DataGrid Margin="3 3 3 3" SelectionMode="Single" CanUserSortColumns="False" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Path=SelectedScenario.MacroList}" SelectedIndex="{Binding Path=SelectedScenario.SelectedIndex}">
+                                <DataGrid Margin="3 3 3 3" SelectionMode="Single" CanUserSortColumns="False" CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding Path=SelectedScenario.MacroList}" SelectedIndex="{Binding Path=SelectedScenario.SelectedIndex}">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridRow">
                                         <EventSetter Event="MouseDoubleClick" Handler="ScenarioMacros_MouseDoubleClick"/>
@@ -277,10 +277,11 @@
                                     </Style>
                                 </DataGrid.Resources>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"/>
-                                    <DataGridTextColumn Header="Actions" Binding="{Binding Path=Actions.Count}"/>
-                                    <DataGridTextColumn Header="Execution Time" Binding="{Binding Path=TotalExecutionTime}"/>
-                                </DataGrid.Columns>
+                                        <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Path=Name}"/>
+                                        <DataGridTextColumn IsReadOnly="True" Header="Actions" Binding="{Binding Path=Actions.Count}"/>
+                                        <DataGridTextColumn IsReadOnly="True" Header="Execution Time" Binding="{Binding Path=TotalExecutionTime}"/>
+                                        <DataGridTextColumn Header="Params" Binding="{Binding Path=Params,ValidatesOnDataErrors=True}" Width="*"/>
+                                    </DataGrid.Columns>
                             </DataGrid>
                             </GroupBox>
                             
@@ -370,18 +371,24 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" Style="{StaticResource PropertyTextBlock}" Text="Mode:"/>
                             <TextBlock Grid.Row="1" Style="{StaticResource PropertyTextBlock}" Text="Delay:"/>
                             <TextBlock Grid.Row="2" Style="{StaticResource PropertyTextBlock}" Text="Loop Time:"/>
                             <TextBlock Grid.Row="3" Style="{StaticResource PropertyTextBlock}" Text="HotKey:"/>
+                            <TextBlock Grid.Row="4" Style="{StaticResource PropertyTextBlock}" Text="Start Index:"/>
+                            <TextBlock Grid.Row="5" Style="{StaticResource PropertyTextBlock}" Text="End Index:"/>
 
                             <ComboBox Grid.Row="0" Style="{StaticResource PropertyValueHolder}" ItemsSource="{x:Static statics:Statics.ExecutionModes}" SelectedItem="{Binding Path=SelectedScenario.ExecutionMode}"/>
                             <TextBox Grid.Row="1" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedScenario.DelayTime}"/>
                             <TextBox Grid.Row="2" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedScenario.LoopTime}"/>
                             <TextBox Grid.Row="3" Style="{StaticResource PropertyValueHolder}" x:Name="ScenarioHotKeyTextBox" Text="{Binding Path=SelectedScenario.HotKey, Converter={StaticResource HotKeyConverter},ConverterParameter=1}" KeyDown="HotKeyTextBox_KeyDown" KeyUp="HotKeyTextBox_KeyUp" />
-                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=SelectedScenario.DelayedLaunch}"/>
+                            <TextBox Grid.Row="4" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedScenario.StartIndex}"/>
+                            <TextBox Grid.Row="5" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedScenario.EndIndex}"/>
+                            <CheckBox Grid.Row="6" Grid.ColumnSpan="2" Margin="0 2 0 0" Content="Delayed Launch" IsChecked="{Binding Path=SelectedScenario.DelayedLaunch}"/>
 
                     </Grid>
                     </GroupBox>
@@ -534,26 +541,31 @@
                         <GroupBox Header="Properties" Grid.Row="2">
                             <Grid Margin="0 5 0 0" Style="{StaticResource ActionPropertiesGrid}">
                                 <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Style="{StaticResource PropertyTextBlock}" Text="Action:"/>
                                 <TextBlock Grid.Row="1" Style="{StaticResource PropertyTextBlock}" Text="X:"/>
                                 <TextBlock Grid.Row="2" Style="{StaticResource PropertyTextBlock}" Text="Y:"/>
                                 <TextBlock Grid.Row="3" Style="{StaticResource PropertyTextBlock}" Text="Pause:"/>
                                 <TextBlock Grid.Row="4" Style="{StaticResource PropertyTextBlock}" Text="Clicks:"/>
+                                <TextBlock Grid.Row="5" Style="{StaticResource PropertyTextBlock}" Text="Group:"/>
                                 <ComboBox Grid.Row="0" Style="{StaticResource PropertyValueHolder}" ItemsSource="{x:Static statics:Statics.ActionTypes}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction.ActionType}" />
                                 <TextBox Grid.Row="1" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.X}"/>
                                 <TextBox Grid.Row="2" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Y}"/>
                                 <TextBox Grid.Row="3" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Pause}"/>
                                 <TextBox Grid.Row="4" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Clicks}"/>
+                                <TextBox Grid.Row="5" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Group}"/>
+                                <TextBox Grid.Row="6" Grid.ColumnSpan="2" Margin="0 2 0 0" Text="{Binding Path=SelectedMacro.SelectedAction.Condition}"/>
                             </Grid>
                         </GroupBox>
                     </Grid>
