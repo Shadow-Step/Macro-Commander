@@ -15,6 +15,7 @@ namespace Macro_Commander.src
     [Serializable]
     public class Action : INotifyWrapper
     {
+        public event Action<string, Action> GroupChangeEvent;
         //Fields
         private UInt32 _x = 0;
         private UInt32 _y = 0;
@@ -22,6 +23,9 @@ namespace Macro_Commander.src
         private Bitmap _image;
         private ActionType _action_type;
         private int _clicks;
+        private string _group;
+        private int _index;
+        private string _condition;
         //Properties
         public UInt32 X
         {
@@ -77,6 +81,34 @@ namespace Macro_Commander.src
                 PropChanged("Clicks");
             }
         }
+        public string Group
+        {
+            get { return _group; }
+            set
+            {
+                GroupChangeEvent(value, this);
+                _group = value;
+                PropChanged();
+            }
+        }
+        public int Index
+        {
+            get { return _index; }
+            set
+            {
+                _index = value;
+                PropChanged();
+            }
+        }
+        public string Condition
+        {
+            get { return _condition; }
+            set
+            {
+                _condition = value;
+                PropChanged();
+            }
+        }
         //Constructors
         public Action()
         {
@@ -95,6 +127,7 @@ namespace Macro_Commander.src
             Pause = meta.Template.Pause;
             ActionType = meta.Template.ActionType;
             Clicks = meta.Template.Clicks;
+            _group = string.Empty;
         }
         public Action(ActionTemplate template, UInt32 x, UInt32 y, Bitmap image) : base()
         {
