@@ -22,6 +22,8 @@ namespace Macro_Commander.src
         private double _loopTime;
         private HotKey _hotKey;
         private bool _editingMode;
+        private int _startIndex;
+        private int _endIndex;
         //Properties
         public ObservableCollection<Macro> MacroList { get; set; }
         public Macro SelectedMacro
@@ -123,6 +125,24 @@ namespace Macro_Commander.src
             {
                 _editingMode = value;
                 PropChanged("EditingMode");
+            }
+        }
+        public int StartIndex
+        {
+            get { return _startIndex; }
+            set
+            {
+                _startIndex = value;
+                PropChanged();
+            }
+        }
+        public int EndIndex
+        {
+            get { return _endIndex; }
+            set
+            {
+                _endIndex = value;
+                PropChanged();
             }
         }
         //Commands
