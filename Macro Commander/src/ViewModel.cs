@@ -319,6 +319,8 @@ namespace Macro_Commander.src
         {
             if (!ExecutionStarted)
             {
+                if (SelectedScenario != null && SelectedScenario.MacroList.Count == 0)
+                    return;
                 try
                 {
                     ExecutionStarted = true;
@@ -326,6 +328,7 @@ namespace Macro_Commander.src
                     var token = _tokenSource.Token;
                     await Task.Factory.StartNew(() =>
                     {
+                        int tact = 0;
                         if (SelectedScenario.DelayedLaunch)
                         {
                             var startTime = DateTime.Now.AddSeconds(SelectedScenario.DelayTime);
@@ -337,10 +340,35 @@ namespace Macro_Commander.src
                         }
                         do
                         {
-                            foreach (var macros in SelectedScenario.MacroList)
+                            for (int i = tact == 0 ? 0 : SelectedScenario.StartIndex; i <= (tact == 0 ? SelectedScenario.MacroList.Count - 1 : SelectedScenario.EndIndex); i++)
                             {
+                                var macros = SelectedScenario.MacroList[i];
                                 foreach (var action in macros.Actions)
                                 {
+                                    //Condition check
+                                    if(action.Condition != null && action.Condition != string.Empty)
+                                    {
+                                        ParamReader reader = new ParamReader();
+                                        var result = reader.ReturnResult(macros.Params, action.Condition);
+                                        switch (result.Value)
+                                        {
+                                            case "Execute":
+                                                if (result.Key == false)
+                                                    continue;
+                                                break;
+                                            case "Skip":
+                                                if (result.Key == true)
+                                                    continue;
+                                                break;
+                                        }
+                                    }
+                                    // Group check
+                                    if (action.Group != string.Empty)
+                                    {
+                                        if (macros.ActionsGroups[action.Group].IndexOf(action) != tact % macros.ActionsGroups[action.Group].Count)
+                                            continue;
+                                    }
+
                                     action.Execute();
                                     var SleepTime = DateTime.Now.AddSeconds(action.Pause);
                                     while (DateTime.Now < SleepTime)
@@ -359,6 +387,7 @@ namespace Macro_Commander.src
                                         return;
                                 } while (DateTime.Now < endTime);
                             }
+                            tact++;
                         } while (SelectedScenario.ExecutionMode == enu.ExecutionMode.Loop);
                         
                     }, token);
@@ -379,6 +408,5 @@ namespace Macro_Commander.src
                 _tokenSource?.Cancel();
             }
         }
-
     }
 }
