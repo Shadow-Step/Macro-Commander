@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Macro_Commander.src
 {
@@ -16,6 +17,8 @@ namespace Macro_Commander.src
         public ObservableCollection<ActionTemplate> ActionTemplates;
         public Macro SelectedMacro;
         public Scenario SelectedScenario;
+        public Dictionary<string, byte[]> GroupColors;
+        public List<byte[]> FixedColors;
         //Constructor
         private ViewModelArgs() { }
 
@@ -28,7 +31,9 @@ namespace Macro_Commander.src
                 Scenarios = viewModel.Scenarios,
                 ActionTemplates = viewModel.ActionTemplates,
                 SelectedMacro = viewModel.SelectedMacro,
-                SelectedScenario = viewModel.SelectedScenario
+                SelectedScenario = viewModel.SelectedScenario,
+                GroupColors = res.Statics.GroupsColors,
+                FixedColors = res.Statics.FixedColors
             };
             return args;
         }

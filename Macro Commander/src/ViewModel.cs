@@ -280,6 +280,8 @@ namespace Macro_Commander.src
                 using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
                 {
                     ViewModelArgs args = (ViewModelArgs)formatter.Deserialize(stream);
+                    res.Statics.GroupsColors = args.GroupColors;
+                    res.Statics.FixedColors = args.FixedColors;
                     MacroList = args.MacroList;
                     Scenarios = args.Scenarios;
                     foreach (var action in Scenarios)
@@ -314,6 +316,7 @@ namespace Macro_Commander.src
             ActionTemplates.Clear();
             ActionTemplates.Add(ActionTemplate.GetPlaceHolder());
             ProjectPath = null;
+            WinWrapper.UnregisterAll();
         }
         private async void ExecuteScenarioAsync(object param)
         {
@@ -345,6 +348,9 @@ namespace Macro_Commander.src
                                 var macros = SelectedScenario.MacroList[i];
                                 foreach (var action in macros.Actions)
                                 {
+                                    if (action.Condition != null && ParamReader.GetResult(tact.ToString(),action.Condition) == false)
+                                        continue;
+                                  
                                     // Group check
                                     if (action.Group != string.Empty)
                                     {

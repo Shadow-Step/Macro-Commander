@@ -105,7 +105,10 @@ namespace Macro_Commander.src
             get { return _condition; }
             set
             {
-                _condition = value;
+                if (value == string.Empty)
+                    _condition = null;
+                else
+                    _condition = value;
                 PropChanged();
             }
         }

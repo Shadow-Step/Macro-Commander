@@ -33,35 +33,52 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4" Grid.Column="0">
-                        <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4" Grid.Column="0" Grid.Row="0">
+                        <Grid>
+                            <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                            <Ellipse VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 2 2" Height="12" Width="12" StrokeThickness="1" Stroke="{Binding Path=Group, Converter={StaticResource GroupColorConverter},ConverterParameter=Stroke}" Fill="{Binding Path=Group, Converter={StaticResource GroupColorConverter}}"/>
+                        </Grid>
                     </Border>
-                    <StackPanel Orientation="Vertical" Margin="2 0 0 0" Grid.Column="1">
-                            <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=X: {0}, Path=X}"/>
-                            <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
-                            <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
-                            <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=C: {0}, Path=Clicks}"/>
+                    <StackPanel Orientation="Vertical" Margin="3 0 2 0" Grid.Column="1" Grid.Row="0">
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=X: {0}, Path=X}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Black" Text="{Binding StringFormat=C: {0}, Path=Clicks}"/>
                     </StackPanel>
-                    <Rectangle Grid.Column="2" HorizontalAlignment="Right" Width="5" Fill="{Binding Path=Group, Converter={StaticResource GroupColorConverter}}"/>
+                    
                 </Grid>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="ListBoxSelected">
             <Border Width="125" CornerRadius="4" BorderThickness="2" BorderBrush="Red" Margin="2 2 2 2">
-                <StackPanel Orientation="Horizontal">
-                    <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4">
-                        <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4" Grid.Column="0" Grid.Row="0">
+                        <Grid>
+                            <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                            <Ellipse VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 2 2" Height="12" Width="12" StrokeThickness="1" Stroke="{Binding Path=Group, Converter={StaticResource GroupColorConverter},ConverterParameter=Stroke}" Fill="{Binding Path=Group, Converter={StaticResource GroupColorConverter}}"/>
+                        </Grid>
                     </Border>
-                    <Separator/>
-                    <StackPanel Orientation="Vertical" Margin="2 0 2 0">
-                        <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=X: {0}, Path=X}"/>
-                        <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
-                        <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
-                        <TextBlock FontWeight="Bold" Foreground="Red" Text="{Binding StringFormat=C: {0}, Path=Clicks}"/>
+                    <StackPanel Orientation="Vertical" Margin="3 0 2 0" Grid.Column="1" Grid.Row="0">
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Red" Text="{Binding StringFormat=X: {0}, Path=X}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Red" Text="{Binding StringFormat=Y: {0}, Path=Y}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Red" Text="{Binding StringFormat=P: {0}, Path=Pause}"/>
+                        <TextBlock FontWeight="Bold" FontSize="12" Foreground="Red" Text="{Binding StringFormat=C: {0}, Path=Clicks}"/>
                     </StackPanel>
-                </StackPanel>
+
+                </Grid>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="ActionTemplateOrigin">
@@ -286,6 +303,7 @@
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Path=Name}"/>
                                         <DataGridTextColumn IsReadOnly="True" Header="Actions" Binding="{Binding Path=Actions.Count}"/>
                                         <DataGridTextColumn IsReadOnly="True" Header="Execution Time" Binding="{Binding Path=TotalExecutionTime}"/>
+                                        <DataGridTextColumn IsReadOnly="False" Header="Param" Binding="{Binding Path=Param}"/>
                                     </DataGrid.Columns>
                             </DataGrid>
                             </GroupBox>
@@ -556,7 +574,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Style="{StaticResource PropertyTextBlock}" Text="Action:"/>
                                 <TextBlock Grid.Row="1" Style="{StaticResource PropertyTextBlock}" Text="X:"/>
@@ -570,6 +588,7 @@
                                 <TextBox Grid.Row="3" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Pause}"/>
                                 <TextBox Grid.Row="4" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Clicks}"/>
                                 <TextBox Grid.Row="5" Style="{StaticResource PropertyValueHolder}" Text="{Binding Path=SelectedMacro.SelectedAction.Group}"/>
+                                <TextBox Grid.Row="6" Grid.ColumnSpan="2" VerticalAlignment="Stretch" Margin="0 2 0 0" Text="{Binding Path=SelectedMacro.SelectedAction.Condition}"/>
                             </Grid>
                         </GroupBox>
                     </Grid>

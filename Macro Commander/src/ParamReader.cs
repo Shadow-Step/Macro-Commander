@@ -14,13 +14,13 @@ namespace Macro_Commander.src
         public static string PARAM_EXTRACT_PATTERN = @"[a-zA-Z]+\s*=\s*[a-zA-Z0-9]+((,\s*[<>]\s?[0-9]+)(,\s*(([+]{2})|([-]{2})|([-+][=]\s?[0-9]+))))?";
         public static string OPERATORS_PATTERN = @"(([+]{2})|([-]{2})|([+-][=])|([<>]))";
         public static string DIGIT_PATTERN = @"[0-9]+";
+        public static string TEMP_PATTERN = @"[<>=]{1}";
         //Methods
         public KeyValuePair<bool,string> ReturnResult(string _params,string _condition)
         {
             
             return new KeyValuePair<bool, string>(true, "Execute");
         }
-        
         public List<ParamsArgs> ParseParamsString(string str)
         {
             List<ParamsArgs> args = new List<ParamsArgs>();
@@ -47,6 +47,23 @@ namespace Macro_Commander.src
                 }
             }
             return args;
+        }
+        public static bool GetResult(string arg1,string arg2)
+        {
+            var x = int.Parse(arg1);
+            var _operator = Regex.Matches(arg2, TEMP_PATTERN)[0].Value;
+            var y = int.Parse(arg2.Split(new char[] {'>','<','='},StringSplitOptions.RemoveEmptyEntries).First());
+            switch (_operator)
+            {
+                case "<":
+                    return x < y;
+                case ">":
+                    return x > y;
+                case "=":
+                    return x == y;
+                default:
+                    return false;
+            }
         }
     }
 
