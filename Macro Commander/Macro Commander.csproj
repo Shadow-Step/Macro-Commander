@@ -61,6 +61,7 @@
     <Compile Include="cvrt\ActionTypeConverter.cs" />
     <Compile Include="cvrt\BitmapSourceConverter.cs" />
     <Compile Include="cvrt\ColorConverter.cs" />
+    <Compile Include="cvrt\GroupColorConverter.cs" />
     <Compile Include="cvrt\HotKeyConverter.cs" />
     <Compile Include="cvrt\ValueNullConverter.cs" />
     <Compile Include="cvrt\VisibilityNullConverter.cs" />
