@@ -345,23 +345,6 @@ namespace Macro_Commander.src
                                 var macros = SelectedScenario.MacroList[i];
                                 foreach (var action in macros.Actions)
                                 {
-                                    //Condition check
-                                    if(action.Condition != null && action.Condition != string.Empty)
-                                    {
-                                        ParamReader reader = new ParamReader();
-                                        var result = reader.ReturnResult(macros.Params, action.Condition);
-                                        switch (result.Value)
-                                        {
-                                            case "Execute":
-                                                if (result.Key == false)
-                                                    continue;
-                                                break;
-                                            case "Skip":
-                                                if (result.Key == true)
-                                                    continue;
-                                                break;
-                                        }
-                                    }
                                     // Group check
                                     if (action.Group != string.Empty)
                                     {
