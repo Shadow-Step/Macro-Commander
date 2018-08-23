@@ -17,43 +17,10 @@ namespace Macro_Commander.src
         //Methods
         public KeyValuePair<bool,string> ReturnResult(string _params,string _condition)
         {
-            var args = ParseParamsString(_params);
-            var cond = ParseString(_condition);
-            KeyValuePair<bool, string> result = new KeyValuePair<bool, string>(false, "Execute");
-            foreach (var condition in cond)
-            {
-                var arg = args.Find(x => x.Param == condition.Param);
-                if (arg == null)
-                    break; 
-                switch (condition.Operator)
-                {
-                    case "==":
-                        if (arg.Value == condition.Value)
-                            result = new KeyValuePair<bool, string>(true, condition.Action);
-                        break;
-                    case "!=":
-                        if (arg.Value != condition.Value)
-                            result = new KeyValuePair<bool, string>(true, condition.Action);
-                        break;
-                }
-                if (result.Key == false)
-                    break;
-            }
-            return result;
+            
+            return new KeyValuePair<bool, string>(true, "Execute");
         }
-        public List<ParamsArgs> ParseString(string str)
-        {
-            List<ParamsArgs> args = new List<ParamsArgs>();
-            var sections = str.Split(new char[] { ';' },StringSplitOptions.RemoveEmptyEntries);
-            foreach (var section in sections)
-            {
-                var result = section.Split(new char[] { ' ' },StringSplitOptions.RemoveEmptyEntries);
-                args.Add(new ParamsArgs(result[0], result[1], result[2]));
-                if (result.Count() == 4)
-                    args.Last().Action = result[3];
-            }
-            return args;
-        }
+        
         public List<ParamsArgs> ParseParamsString(string str)
         {
             List<ParamsArgs> args = new List<ParamsArgs>();
