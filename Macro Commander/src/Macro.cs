@@ -156,6 +156,7 @@ namespace Macro_Commander.src
                 {
                     ActionsGroups[action.Group] = null;
                     ActionsGroups.Remove(action.Group);
+                    res.Statics.RemoveGroupFromColorDictionary(action.Group);
                 }
                 else
                     list.Sort((x, y) => x.Index.CompareTo(y.Index));
@@ -163,7 +164,10 @@ namespace Macro_Commander.src
             if(group != string.Empty)
             {
                 if (!ActionsGroups.ContainsKey(group))
+                {
                     ActionsGroups.Add(group, new List<Action>());
+                    res.Statics.AddGroupToColorDictionary(group);
+                }
                 var list = ActionsGroups[group];
                 list.Add(action);
                 list.Sort((x, y) => x.Index.CompareTo(y.Index));
