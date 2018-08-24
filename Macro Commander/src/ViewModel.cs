@@ -42,7 +42,7 @@ namespace Macro_Commander.src
         private ActionTemplate _selectedTemplate;
         private string _projectPath;
         private bool _executionStarted;
-        
+        private bool _imitateClick;
         //Properties
         public ObservableCollection<Macro> MacroList
         {
@@ -122,7 +122,15 @@ namespace Macro_Commander.src
                 PropChanged("ExecutionStarted");
             }
         }
-        
+        public bool ImitateClick
+        {
+            get { return _imitateClick; }
+            set
+            {
+                _imitateClick = value;
+                PropChanged();
+            }
+        }
         //Commands
         public RelayCommand CommandSaveToFile { get; set; }
         public RelayCommand CommandLoadFromFile { get; set; }

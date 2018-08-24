@@ -107,6 +107,8 @@ namespace Macro_Commander
                                         {
                                             var pos = System.Windows.Forms.Cursor.Position;
                                             ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
+                                            if(ViewModel.viewModel.ImitateClick)
+                                                ViewModel.viewModel.SelectedMacro.SelectedAction.Execute();
 #if DEBUGLOG
                                             command = "CommandAddAction";
                                             code = 1;
