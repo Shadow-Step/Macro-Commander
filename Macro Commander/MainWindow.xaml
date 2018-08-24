@@ -41,6 +41,7 @@
                     <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4" Grid.Column="0" Grid.Row="0">
                         <Grid>
                             <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Text="!" FontWeight="Bold" Margin="2 0 0 1" Foreground="{Binding Path=Condition,Converter={StaticResource GroupColorConverter},ConverterParameter=Condition}"/>
                             <Ellipse VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 2 2" Height="12" Width="12" StrokeThickness="1" Stroke="{Binding Path=Group, Converter={StaticResource GroupColorConverter},ConverterParameter=Stroke}" Fill="{Binding Path=Group, Converter={StaticResource GroupColorConverter}}"/>
                         </Grid>
                     </Border>
@@ -68,6 +69,7 @@
                     <Border x:Name="Brd" BorderThickness="1" BorderBrush="Black" CornerRadius="4" Grid.Column="0" Grid.Row="0">
                         <Grid>
                             <Image Margin="1 1 1 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Path=Image, Converter={StaticResource BitmapSourceConverter}}"/>
+                            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Text="!" FontWeight="Bold" Margin="2 0 0 1" Foreground="{Binding Path=Condition,Converter={StaticResource GroupColorConverter},ConverterParameter=Condition}"/>
                             <Ellipse VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 2 2" Height="12" Width="12" StrokeThickness="1" Stroke="{Binding Path=Group, Converter={StaticResource GroupColorConverter},ConverterParameter=Stroke}" Fill="{Binding Path=Group, Converter={StaticResource GroupColorConverter}}"/>
                         </Grid>
                     </Border>
@@ -245,6 +247,7 @@
             <Button Style="{StaticResource ToolBarButton}" Content="S"/>
             <Button Style="{StaticResource ToolBarButton}" Content="Sa"/>
             <Separator/>
+            <CheckBox IsChecked="{Binding Path=ImitateClick}" Content="Click"/>
         </ToolBar>
         <TabControl Grid.Row="2" Margin="15 5 15 5">
             <!--Scenario TAB-->

@@ -16,6 +16,8 @@ namespace Macro_Commander
             {
                 if ((parameter as string) == "Stroke")
                     return "Black";
+                if ((parameter as string) == "Condition")
+                    return "Red";
                 byte[] b = res.Statics.GroupsColors[group];
                 return new SolidColorBrush(Color.FromRgb(b[0],b[1],b[2]));
             }
