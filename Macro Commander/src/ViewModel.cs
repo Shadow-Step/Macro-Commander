@@ -43,6 +43,8 @@ namespace Macro_Commander.src
         private string _projectPath;
         private bool _executionStarted;
         private bool _imitateClick;
+        private bool _showHidden;
+        private bool _minimizeHidden;
         //Properties
         public ObservableCollection<Macro> MacroList
         {
@@ -128,6 +130,24 @@ namespace Macro_Commander.src
             set
             {
                 _imitateClick = value;
+                PropChanged();
+            }
+        }
+        public bool ShowHidden
+        {
+            get { return _showHidden; }
+            set
+            {
+                _showHidden = value;
+                PropChanged();
+            }
+        }
+        public bool MinimizeHidden
+        {
+            get { return _minimizeHidden; }
+            set
+            {
+                _minimizeHidden = value;
                 PropChanged();
             }
         }

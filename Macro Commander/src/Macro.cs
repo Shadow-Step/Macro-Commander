@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -91,7 +92,11 @@ namespace Macro_Commander.src
         public RelayCommand CommandExecute { get; set; }
         public RelayCommand CommandMoveForward { get; set; }
         public RelayCommand CommandMoveBackwards { get; set; }
-
+        public RelayCommand CommandMergeIntoGroup { get; set; }
+        public RelayCommand CommandDetachFromGroup { get; set; }
+        public RelayCommand CommandHideSelected { get; set; }
+        public RelayCommand CommandUnhideAll { get; set; }
+        public RelayCommand CommandShowSelected { get; set; }
         //Validation check
         public string Error => throw new NotImplementedException();
         public string this[string columnName]
@@ -118,6 +123,11 @@ namespace Macro_Commander.src
             CommandExecute = new RelayCommand(Execute);
             CommandMoveForward = new RelayCommand(MoveActionForward);
             CommandMoveBackwards = new RelayCommand(MoveActionBackwards);
+            CommandMergeIntoGroup = new RelayCommand(MergeIntoGroup,x=>(x as System.Collections.IList).Count > 0);
+            CommandDetachFromGroup = new RelayCommand(DetachFromGroup, x => (x as System.Collections.IList).Count > 0);
+            CommandHideSelected = new RelayCommand(HideSelected, x => (x as System.Collections.IList).Count > 0);
+            CommandShowSelected = new RelayCommand(ShowSelected, x => (x as System.Collections.IList).Count > 0);
+            CommandUnhideAll = new RelayCommand(UnhideAll);
             Actions = new ObservableCollection<Action>();
             ActionsGroups = new Dictionary<string, List<Action>>();
             Name = "New Macro";
@@ -244,6 +254,65 @@ namespace Macro_Commander.src
                 }
             }
         }
-        
+        private void MergeIntoGroup(object param)
+        {
+            Dictionary<string, int> groups = new Dictionary<string, int>();
+            var actions = param as System.Collections.IList;
+            foreach (var x in actions )
+            {
+                var item = x as Action;
+                if(item.Group != null && item.Group != string.Empty)
+                {
+                    if (!groups.ContainsKey(item.Group))
+                        groups.Add(item.Group, 1);
+                    else
+                        groups[item.Group]++;
+                }
+            }
+            string group_name = null;
+            if (groups.Count == 0)
+                group_name = $"group {ActionsGroups.Count}";
+            else
+            {
+                var max = groups.Max((x) => x.Value);
+                var name = from item in groups where item.Value == max select item;
+                group_name = name.First().Key;
+            }
+            foreach (var x in actions)
+            {
+                var item = x as Action;
+                if (item.Group != group_name)
+                    item.Group = group_name;
+            }
+        }
+        private void DetachFromGroup(object param)
+        {
+            foreach (var item in param as System.Collections.IList)
+            {
+                (item as Action).Group = string.Empty;
+            }
+        }
+        private void HideSelected(object param)
+        {
+            foreach (var item in param as IList)
+            {
+                (item as Action).Hidden = true;
+            }
+        }
+        private void ShowSelected(object param)
+        {
+            foreach (var item in param as IList)
+            {
+                (item as Action).Hidden = false;
+            }
+        }
+        private void UnhideAll(object param)
+        {
+            foreach (var item in Actions)
+            {
+                item.Hidden = false;
+            }
+        }
+
     }
 }

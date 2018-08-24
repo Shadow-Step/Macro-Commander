@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +15,7 @@ using Macro_Commander.enu;
 namespace Macro_Commander.src
 {
     [Serializable]
-    public class Action : INotifyWrapper
+    public class Action : INotifyWrapper , IDataErrorInfo
     {
         public event Action<string, Action> GroupChangeEvent;
         //Fields
@@ -26,6 +28,7 @@ namespace Macro_Commander.src
         private string _group;
         private int _index;
         private string _condition;
+        private bool _hidden;
         //Properties
         public UInt32 X
         {
@@ -112,6 +115,41 @@ namespace Macro_Commander.src
                 PropChanged();
             }
         }
+        public bool Hidden
+        {
+            get { return _hidden; }
+            set
+            {
+                _hidden = value;
+                PropChanged();
+            }
+        }
+
+        public string Error => throw new NotImplementedException();
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = string.Empty;
+                if (Condition == null)
+                    return error;
+                switch (columnName)
+                {
+                    case "Condition":
+                        if (Condition == string.Empty)
+                            return error;
+                        var result = Regex.IsMatch(Condition, ParamReader.CONDITION_PATTERN);
+                        if (result == false)
+                            error = "Syntax error";
+                        break;
+                    default:
+                        break;
+                }
+                return error;
+            }
+        }
+
         //Constructors
         public Action()
         {

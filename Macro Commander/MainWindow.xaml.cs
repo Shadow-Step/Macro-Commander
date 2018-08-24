@@ -105,12 +105,15 @@ namespace Macro_Commander
                                     {
                                         if(template.HotKey == key)
                                         {
-                                            var pos = System.Windows.Forms.Cursor.Position;
-                                            ViewModel.viewModel.SelectedMacro?.CommandAddAction.Execute(new ActionMeta((uint)pos.X,(uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
-                                            if(ViewModel.viewModel.ImitateClick)
-                                                ViewModel.viewModel.SelectedMacro.SelectedAction.Execute();
+                                                if (ViewModel.viewModel.SelectedMacro != null)
+                                                {
+                                                    var pos = System.Windows.Forms.Cursor.Position;
+                                                    ViewModel.viewModel.SelectedMacro.CommandAddAction.Execute(new ActionMeta((uint)pos.X, (uint)pos.Y, template, ScreenCapture.CaptureFromScreen(64, 64, pos.X, pos.Y)));
+                                                    if (ViewModel.viewModel.ImitateClick)
+                                                        ViewModel.viewModel.SelectedMacro.SelectedAction.Execute();
+                                                }
 #if DEBUGLOG
-                                            command = "CommandAddAction";
+                                                command = "CommandAddAction";
                                             code = 1;
 #endif
                                         }
@@ -327,5 +330,25 @@ namespace Macro_Commander
             ViewModel.viewModel.CommandEditItem.Execute(ViewModel.viewModel.SelectedTemplate);
         }
 
+        private void MergeIntoGroup(object sender, RoutedEventArgs e)
+        {
+            var x = MainViewListBox.SelectedItems;
+            ViewModel.viewModel.SelectedMacro.CommandMergeIntoGroup.Execute(x);
+        }
+        private void DetachFromGroup(object sender, RoutedEventArgs e)
+        {
+            var x = MainViewListBox.SelectedItems;
+            ViewModel.viewModel.SelectedMacro.CommandDetachFromGroup.Execute(x);
+        }
+        private void HideSelected(object sender, RoutedEventArgs e)
+        {
+            var x = MainViewListBox.SelectedItems;
+            ViewModel.viewModel.SelectedMacro.CommandHideSelected.Execute(x);
+        }
+        private void ShowSelected(object sender, RoutedEventArgs e)
+        {
+            var x = MainViewListBox.SelectedItems;
+            ViewModel.viewModel.SelectedMacro.CommandShowSelected.Execute(x);
+        }
     }
 }

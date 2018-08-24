@@ -15,6 +15,7 @@ namespace Macro_Commander.src
         public static string OPERATORS_PATTERN = @"(([+]{2})|([-]{2})|([+-][=])|([<>]))";
         public static string DIGIT_PATTERN = @"[0-9]+";
         public static string TEMP_PATTERN = @"[<>=]{1}";
+        public static string CONDITION_PATTERN = @"([<>=]{1}[0-9]+)+";
         //Methods
         public KeyValuePair<bool,string> ReturnResult(string _params,string _condition)
         {
