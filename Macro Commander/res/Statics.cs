@@ -19,6 +19,7 @@ namespace Macro_Commander.res
         };
         public static List<enu.ActionType> ActionTypes = new List<ActionType>() { ActionType.MouseLeftButtonClick, ActionType.MouseRightButtonClick, ActionType.MouseMove };
         public static List<enu.ExecutionMode> ExecutionModes { get; set; } = new List<ExecutionMode>() { enu.ExecutionMode.Loop, enu.ExecutionMode.Single };
+        public static List<string> Resolutions { get; set; } = new List<string>() { "1360x768", "1280x768", "1024x768" };
         public static Dictionary<string, byte[]> GroupsColors { get; set; } = new Dictionary<string, byte[]>();
         public static List<byte[]> FixedColors { get; set; } = new List<byte[]>()
         {

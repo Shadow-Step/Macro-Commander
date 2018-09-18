@@ -278,6 +278,9 @@
             <Button Style="{StaticResource ToolBarButton}" Content="Sa"/>
             <Separator/>
             <CheckBox IsChecked="{Binding Path=ImitateClick}" Content="Click"/>
+            <Separator/>
+            <TextBlock Margin="5 0 0 0" Text="Resolution:" VerticalAlignment="Center"/>
+            <ComboBox Margin="5 0 0 0" ItemsSource="{x:Static statics:Statics.Resolutions}" SelectedItem="{Binding Path=Resolution}"/>
         </ToolBar>
         <TabControl Grid.Row="2" Margin="15 5 15 5">
             <!--Scenario TAB-->
@@ -533,6 +536,8 @@
                                     <ListBox x:Name="MainViewListBox" SelectionMode="Extended" Margin="3 3 3 3" Style="{StaticResource ListBoxStyle}" ItemContainerStyle="{StaticResource ListBoxItems}" ItemsSource="{Binding Path=SelectedMacro.Actions}" SelectedItem="{Binding Path=SelectedMacro.SelectedAction}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                         <ListBox.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem Header="Remove" Command="{Binding Path=SelectedMacro.CommandDelAction}" CommandParameter="{Binding Path=SelectedMacro.SelectedAction}"/>
+                                                <Separator/>
                                                 <MenuItem Header="Merge" Click="MergeIntoGroup"/>
                                                 <MenuItem Header="Detach" Click="DetachFromGroup"/>
                                                 <Separator/>
@@ -641,7 +646,7 @@
         </TabControl>
         <StatusBar Grid.Row="3" Background="LightGray">
             <StatusBarItem>
-                <TextBlock Text="Alpha build"/>
+                
             </StatusBarItem>
         </StatusBar>
     </Grid>

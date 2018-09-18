@@ -150,8 +150,8 @@ namespace Macro_Commander.src
         private static UInt32 MOUSEEVENTF_RIGHTDOWN = 0x0008;
         private static UInt32 MOUSEEVENTF_RIGHTUP = 0x0010;
 
-        private const double SCREEN_WIDTH = 1360;
-        private const double SCREEN_HEIGHT = 768;
+        private static double SCREEN_WIDTH = 1360;
+        private static double SCREEN_HEIGHT = 768;
 
 
         public static IntPtr hWnd { get; set; }
@@ -257,6 +257,12 @@ namespace Macro_Commander.src
 #endif
             }
             HotKeys.Clear();
+        }
+        public static void SetResolution(string resolution)
+        {
+            var temp = resolution.Split(new char[] { 'x' });
+            SCREEN_WIDTH = double.Parse(temp[0]);
+            SCREEN_HEIGHT = double.Parse(temp[1]);
         }
     }
 }

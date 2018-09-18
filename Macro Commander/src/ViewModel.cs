@@ -45,6 +45,7 @@ namespace Macro_Commander.src
         private bool _imitateClick;
         private bool _showHidden;
         private bool _minimizeHidden;
+        private string _resolution;
         //Properties
         public ObservableCollection<Macro> MacroList
         {
@@ -151,6 +152,16 @@ namespace Macro_Commander.src
                 PropChanged();
             }
         }
+        public string Resolution
+        {
+            get { return _resolution; }
+            set
+            {
+                _resolution = value;
+                WinWrapper.SetResolution(_resolution);
+                PropChanged();
+            }
+        }
         //Commands
         public RelayCommand CommandSaveToFile { get; set; }
         public RelayCommand CommandLoadFromFile { get; set; }
@@ -179,7 +190,9 @@ namespace Macro_Commander.src
                 ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F3"), 0.5, enu.ActionType.MouseLeftButtonClick, 2));
                 ActionTemplates.Add(new ActionTemplate(HotKey.CreateHotKey(enu.HotKeyStatus.AddAction, "F4"), 3, enu.ActionType.MouseMove, 0));
                 ActionTemplates.Add(ActionTemplate.GetPlaceHolder());
-                
+                Resolution = "1360x768";
+                ShowHidden = true;
+                MinimizeHidden = true;
             }
             catch (Exception e)
             {
@@ -376,6 +389,8 @@ namespace Macro_Commander.src
                                 var macros = SelectedScenario.MacroList[i];
                                 foreach (var action in macros.Actions)
                                 {
+                                    if (action.Hidden)
+                                        continue;
                                     if (action.Condition != null && ParamReader.GetResult(tact.ToString(),action.Condition) == false)
                                         continue;
                                   
@@ -387,6 +402,7 @@ namespace Macro_Commander.src
                                     }
 
                                     action.Execute();
+
                                     var SleepTime = DateTime.Now.AddSeconds(action.Pause);
                                     while (DateTime.Now < SleepTime)
                                     {
